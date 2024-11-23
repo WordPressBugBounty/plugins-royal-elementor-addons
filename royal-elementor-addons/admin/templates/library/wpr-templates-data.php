@@ -236,6 +236,18 @@ class WPR_Templates_Data {
 					'label' => 'new',
 					'priority' => 1,
 				],
+				'v2' => [
+					'name' => 'Landing Page - Business V2',
+					'pages' => 'home,about,services,benefits,pricing,faq,blog,single-blog,contact,',
+					'plugins' => '{}',
+					'tags' => 'free digital product single-page landing page one page onepage landingpage agency digital app business corporate creative lead capture marketing startup',
+					'theme-builder' => true,
+					'woo-builder' => false,
+					'off-canvas' => true,
+					'price' => $is_pro_active ? 'free' : 'free',
+					'label' => 'new',
+					'priority' => 1,
+				],
 			],
 			'landing-page-digital-product' => [
 				'v1' => [
@@ -605,6 +617,18 @@ class WPR_Templates_Data {
 				'v6' => [
 					'name' => 'Magazine Blog v6',
 					'pages' => 'home,category,single-blog,contact,',
+					'plugins' => '{}',
+					'tags' => 'blogger blog posts content news newspaper journal magazine business blog publishing theme builder sports grid slider magazine',
+					'theme-builder' => true,
+					'woo-builder' => false,
+					'off-canvas' => true,
+					'price' => $is_pro_active ? 'free' : 'pro',
+					'label' => 'new',
+					'priority' => 6,
+				],
+				'v7' => [
+					'name' => 'Magazine Blog v7',
+					'pages' => 'home,home-v2,home-v3,home-v4,home-v5,category,single-blog,contact,',
 					'plugins' => '{}',
 					'tags' => 'blogger blog posts content news newspaper journal magazine business blog publishing theme builder sports grid slider magazine',
 					'theme-builder' => true,
@@ -2007,6 +2031,12 @@ class WPR_Templates_Data {
 				'name' => 'Cybersecurity',
 				'pages' => ['home','about','services','pricing','contact'],
 				'preview' => ['home','about-us','services','pricing','contact'],
+				'price' => $is_pro_active ? 'free' : 'pro',
+			],
+			'magazine-blog-v7' => [
+				'name' => 'Magazine Blog v7',
+				'pages' => ['home','home-v2','home-v3','home-v4','home-v5','contact'],
+				'preview' => ['home','home-v2','home-v3','home-v4','home-v5','contact'],
 				'price' => $is_pro_active ? 'free' : 'pro',
 			],
 			'developer-portfolio-v1' => [

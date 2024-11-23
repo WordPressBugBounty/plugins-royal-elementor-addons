@@ -1414,7 +1414,7 @@ class Wpr_Woo_Grid extends Widget_Base {
 				'label' => esc_html__( 'Select Element', 'wpr-addons' ),
 				'type' => Controls_Manager::SELECT,
 				'default' => 'title',
-				'options' => $element_select,
+				'options' => $element_select + Utilities::get_woo_taxonomies(),
 				'separator' => 'after'
 			]
 		);
@@ -9735,6 +9735,10 @@ class Wpr_Woo_Grid extends Widget_Base {
 				break;
 			case 'custom-field':
 				$this->render_product_custom_fields( $settings, $class, $post_id );
+				break;
+
+			default:
+				$this->render_product_categories( $settings, $class, $post_id );
 				break;
 		}
 
