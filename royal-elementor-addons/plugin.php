@@ -248,7 +248,10 @@ class Plugin {
 	public function mega_menu_ajax_loading() {
 		$elementor = \Elementor\Plugin::instance();
 		$mega_id = get_post_meta( $_GET['item_id'], 'wpr-mega-menu-item', true);
-		$content = $elementor->frontend->get_builder_content_for_display($mega_id);
+		$type = get_post_meta(get_the_ID(), '_wpr_template_type', true) || get_post_meta($mega_id, '_elementor_template_type', true);
+		$has_css = 'internal' === get_option( 'elementor_css_print_method' ) || '' !== $type;
+		
+		$content = $elementor->frontend->get_builder_content_for_display($mega_id, $has_css);
 
 		wp_send_json( $content );
 	}
