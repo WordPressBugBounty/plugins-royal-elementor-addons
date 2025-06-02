@@ -583,9 +583,9 @@ class Plugin {
 				'select_empty' => esc_html__('Nothing selected', 'wpr-addons'),
 				'file_empty' => esc_html__('Please upload a file', 'wpr-addons'),
 				'recaptcha_error' => esc_html__('Recaptcha Error', 'wpr-addons'),
-				'woo_shop_ppp' => get_option('wpr_woo_shop_ppp'),
-				'woo_shop_cat_ppp' => get_option('wpr_woo_shop_cat_ppp'),
-				'woo_shop_tag_ppp' => get_option('wpr_woo_shop_tag_ppp'),
+				'woo_shop_ppp' => get_option('wpr_woo_shop_ppp', 9),
+				'woo_shop_cat_ppp' => get_option('wpr_woo_shop_cat_ppp', 9),
+				'woo_shop_tag_ppp' => get_option('wpr_woo_shop_tag_ppp', 9),
 				'is_product_category' => function_exists('is_product_category') ? is_product_category() : false,
 				'is_product_tag' => function_exists('is_product_tag') ? is_product_tag() : false,
 				// 'token' => $custom_token

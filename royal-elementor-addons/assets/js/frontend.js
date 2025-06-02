@@ -226,21 +226,59 @@
 			    changePositionType();
 			    changeAdminBarOffset();
 
-			    $(window).smartresize(function() { 
+			    $(window).smartresize(function() {
+					recalculateVariables();
+			    });
+
+				// Debounce function
+				function debounce(func, wait) {
+					let timeout;
+					return function(...args) {
+						const context = this;
+						clearTimeout(timeout);
+						timeout = setTimeout(() => func.apply(context, args), wait);
+					};
+				}
+
+				// Function to be called when mutations are observed
+				const handleMutations = debounce(function(mutationsList) {
+					for (let mutation of mutationsList) {
+						if (mutation.type === 'childList') {
+							// Recalculate variables when new content is added
+							$(window).trigger('scroll');
+							recalculateVariables();
+						}
+					}
+				}, 100); // Adjust the debounce delay as needed
+
+				// Create a MutationObserver instance
+				const observer = new MutationObserver(handleMutations);
+
+				// Start observing the target node for configured mutations
+				observer.observe(document.body, { childList: true, subtree: true });
+
+				$(window).scroll(function() {
+					if ($scope && $scope.css('position') === 'relative') {
+						recalculateVariables();
+					}
+				});
+			    
+			    if (!stickySectionExists) {
+			        positionStyle = 'relative';
+			    }
+
+				function recalculateVariables() {
 					distanceFromTop = $scope.offset().top;
 					windowHeight = $(window).height(),
 					elementHeight = $scope.outerHeight(true),
 					distanceFromBottom = $(document).height() - (distanceFromTop + elementHeight);
 					
 			        viewportWidth = $('body').prop('clientWidth') + 17;
+					
 					if ( $(window).scrollTop() <= stickyEffectsOffset ) {
 						changePositionType();
 					}
-			    });
-			    
-			    if (!stickySectionExists) {
-			        positionStyle = 'relative';
-			    }
+				}
 
 			    function changePositionType() {
 			        if ( !$scope.hasClass('wpr-sticky-section-yes') && !$scope.find('.wpr-sticky-section-yes-editor') ) {
@@ -357,12 +395,7 @@
 										$scope.addClass('wpr-' + stickyAnimation + '-out');
 									}
 								}
-							}
-							
-							// else if ( scrollPos <= stickyHideDistance ) {
-							// 	// At or above the top
-							// 	$scope.removeClass('wpr-sticky-hide');
-							// }	
+							}	
 						}
 
 						// Clear any previous timeout
@@ -373,16 +406,9 @@
 						  prevScrollPos = scrollPos;
 						}, 10);
 					}
-
-					// const debouncedHandleScroll = _.debounce(handleScroll, 50);
 					
 					if ( 'sticky' == positionStyle ) {
-						// $(window).scroll(debouncedHandleScroll);
 						$(window).scroll(handleScroll);
-						
-						// $(window).scroll(function() {
-						// 	debounceScroll(handleScroll, 50);
-						// });
 					} else if ( 'fixed' == positionStyle ) {
 						applyPosition();
 						$(window).scroll(handleScroll);
@@ -1241,8 +1267,6 @@
 					} else if (WprConfig.is_product_tag) {
 						itemsPerPage = +WprConfig.woo_shop_tag_ppp;
 					}
-
-					console.log(itemsPerPage);
 					
 					// Ensure itemsPerPage is correctly parsed and is a valid number
 					if (isNaN(itemsPerPage) || itemsPerPage <= 0) {
@@ -3286,6 +3310,7 @@
 									postSharing();
 			
 									lazyLoadObserver();
+
 									// Maybe there is some other way
 									window.dispatchEvent(new Event('resize'));
 									window.dispatchEvent(new Event('scroll'));
