@@ -647,7 +647,7 @@ class Plugin {
 
 		wp_register_script(
 			'wpr-google-maps',
-			'https://maps.googleapis.com/maps/api/js?key='. esc_attr(get_option('wpr_google_map_api_key')),
+			'https://maps.googleapis.com/maps/api/js?key='. esc_attr(get_option('wpr_google_map_api_key')) . '&language='. esc_attr(get_option('wpr_google_map_language')),
 			[],
 			'',
 			true

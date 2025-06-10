@@ -597,7 +597,7 @@ button.lg-icon {
     position: relative;
 }
 
-.wpr-nav-menu-horizontal .wpr-nav-menu>li {
+.wpr-nav-menu-horizontal>.wpr-nav-menu>li {
     display: inline-block;
 }
 
@@ -617,7 +617,7 @@ button.lg-icon {
     margin: 0;
 }
 
-.wpr-nav-menu-horizontal .wpr-nav-menu>li:first-child,
+.wpr-nav-menu-horizontal>.wpr-nav-menu>li:first-child,
 .wpr-pointer-none .wpr-nav-menu-horizontal>li:first-child .wpr-menu-item,
 .wpr-pointer-line-fx .wpr-nav-menu-horizontal>li:first-child .wpr-menu-item {
     padding-left: 0 !important;
@@ -651,14 +651,25 @@ div[class*="wpr-main-menu-align-"] .wpr-nav-menu-vertical .wpr-nav-menu>li>.wpr-
     text-align: left;
 }
 
-.wpr-main-menu-align-center .wpr-nav-menu-horizontal .wpr-nav-menu,
-.wpr-main-menu-align-center .wpr-nav-menu-vertical .wpr-menu-item {
+.wpr-main-menu-align-center > .elementor-widget-container > .wpr-nav-menu-horizontal > .wpr-nav-menu,
+.wpr-main-menu-align-center > .elementor-widget-container > .wpr-nav-menu-vertical > .wpr-menu-item {
     text-align: center;
 }
 
-.wpr-main-menu-align-right .wpr-nav-menu-horizontal .wpr-nav-menu,
-.wpr-main-menu-align-right .wpr-nav-menu-vertical .wpr-menu-item,
-.wpr-main-menu-align-right .wpr-nav-menu-vertical .wpr-sub-menu li a {
+.wpr-main-menu-align-center > .wpr-nav-menu-horizontal > .wpr-nav-menu,
+.wpr-main-menu-align-center > .wpr-nav-menu-vertical > .wpr-menu-item {
+    text-align: center;
+}
+
+.wpr-main-menu-align-right > .elementor-widget-container > .wpr-nav-menu-horizontal > .wpr-nav-menu,
+.wpr-main-menu-align-right > .elementor-widget-container > .wpr-nav-menu-vertical > .wpr-menu-item,
+.wpr-main-menu-align-right > .elementor-widget-container > .wpr-nav-menu-vertical > .wpr-sub-menu li a {
+    text-align: right;
+}
+
+.wpr-main-menu-align-right > .wpr-nav-menu-horizontal > .wpr-nav-menu,
+.wpr-main-menu-align-right > .wpr-nav-menu-vertical > .wpr-menu-item,
+.wpr-main-menu-align-right > .wpr-nav-menu-vertical > .wpr-sub-menu li a {
     text-align: right;
 }
 
@@ -14252,6 +14263,10 @@ flex-grow: 0; */
     transition: visibility 0s linear !important;
 }
 
+.wpr-sticky-active {
+    position: fixed !important;
+}
+
 .wpr-sticky-replace-header-yes + div,
 .wpr-sticky-replace-header-yes + section,
 .wpr-sticky-replace-header-yes + header {
@@ -15079,13 +15094,12 @@ flex-grow: 0; */
     background-color: transparent !important;
 }
 
-.wpr-wishlist-sidebar .wpr-wishlist,
-.wpr-wishlist-sidebar .wpr-wishlist-goga-wrap {
+.wpr-wishlist-sidebar .wpr-wishlist {
     position: fixed;
     top: 0;
     left: 0;
     width: 100% !important;
-    height: 100%;
+    height: 100vh;
     z-index: 999;
     margin: 0 !important;
 }
