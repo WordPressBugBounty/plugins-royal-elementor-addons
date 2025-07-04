@@ -1198,6 +1198,20 @@ class WPR_Templates_Data {
 					'priority' => 4,
 				],
 			],
+			'car-detailing' => [
+				'v1' => [
+					'name' => 'Car Detailing V1',
+					'pages' => 'home,about,services,service-details,team,gallery,pricing,faq,blog,single-blog,contact,',
+					'plugins' => '{}',
+					'tags' => 'car detailing auto automotive service vehicle business engine wash clean paint mechanic repair tech motors',
+					'theme-builder' => true,
+					'woo-builder' => false,
+					'off-canvas' => false,
+					'price' => $is_pro_active ? 'free' : 'pro',
+					'label' => 'new',
+					'priority' => 10,
+				],
+			],
 			'car-repair' => [
 				'v1' => [
 					'name' => 'Car Repair V1',
@@ -2470,6 +2484,12 @@ class WPR_Templates_Data {
 				'name' => 'Digital SEO Agency v2',
 				'pages' => ['home','about','solutions','awards','careers','work','email-marketing','paid-search-marketing','search-engine-optimization','contact','blog'],
 				'preview' => ['home','about','solutions','awards','careers','work','email-marketing','paid-search-marketing','search-engine-optimization','contact','blog'],
+				'price' => $is_pro_active ? 'free' : 'pro',
+			],
+			'car-detailing-v1' => [
+				'name' => 'Car Detailing V1',
+				'pages' => ['home','about','services','service-details','team','gallery','pricing','faq','blog','contact'],
+				'preview' => ['home','about','services','service-details','team','gallery','pricing','faq','blog','contact'],
 				'price' => $is_pro_active ? 'free' : 'pro',
 			],
 			'fitness-gym-v1' => [
