@@ -1,9 +1,9 @@
-=== Royal Elementor Addons and Templates ===
-Contributors: WP Royal, rubeushagrid13, cyberpinky, elementoraddonswpr, ggedenidze1982, wprduke
+=== Royal Addons for Elementor – Addons and Templates Kit for Elementor ===
+Contributors: wproyal, rubeushagrid13, cyberpinky, elementoraddonswpr, ggedenidze1982, wprduke
 Tags: elementor, elementor templates, elementor addons, widgets for elementor, elementor widgets, elementor mega menu, elementor woocommerce builder, theme builder, header footer builder, elementor post grid, elementor product grid, addons for elementor
-Stable tag: 1.7.1034
+Stable tag: 1.7.1047
 Requires at least: 5.0
-Tested up to: 6.8.2
+Tested up to: 6.9
 Requires PHP: 5.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -14,7 +14,7 @@ Elementor Post Grid, Portfolio, Woocommerce Grid builder Widgets. Slider, Carous
 
 **Royal Elementor addons** is the most versatile, intuitive, and easy to use [Popular Page Builder](https://wordpress.org/plugins/elementor/) extension. Our goal is to provide you with the tools to make things happen, efficiently, and fast compare to other elementor addons. Choosing us is not only a mindset, but it is also a requirement if you intend to gain an edge over your competitors when creating your website. The best part is that you can design anything **without having to touch a single line of code**.
 
-Comes with **100+ Elementor addons, 140+ Elementor Templates KIT (Growing Each Week), Theme Builder, WooCommerce Builder, Elementor Mega Menu Builder, Popup Builder, Premade Widget Blocks & Extensions.** Creative and self-intuitive widgets to take your WordPress website to the next level. **All widgets are Free** and the Pro Version offers even more advanced functionality.
+Comes with **100+ Elementor addons, 140+ Elementor Templates KIT (Growing Each Week), Theme Builder, WooCommerce Builder, Elementor Mega Menu Builder, Advanced Filters (filter any CPT, taxonomies and metafields), Popup Builder, Premade Widget Blocks & Extensions.** Creative and self-intuitive widgets to take your WordPress website to the next level. **All widgets are Free** and the Pro Version offers even more advanced functionality.
 
 *Free and Pro functionalities are mixed in the Widget Demos below.*
 
@@ -28,6 +28,7 @@ Comes with **100+ Elementor addons, 140+ Elementor Templates KIT (Growing Each W
 - [**Post Grid**](https://royal-elementor-addons.com/elementor-grid-widget-examples/?ref=rea-wpo-pp-details-tab#filter:category-blog-grid)
 - [**Post Carousel**](https://royal-elementor-addons.com/elementor-grid-widget-examples/post-carousel-examples/?ref=rea-wpo-pp-details-tab#filter:category-portfolio-grid)
 - [**Post Slider**](https://royal-elementor-addons.com/elementor-grid-widget-examples/post-slider-examples/?ref=rea-wpo-pp-details-tab)
+- [**Advanced Filters (filter any CPT, taxonomies and metafields)**](https://demosites.royal-elementor-addons.com/woo-advanced-filters-preview/preview-links/?ref=rea-wpo-pp-details-tab)
 - [**Form Builder**](https://royal-elementor-addons.com/elementor-form-builder-widget/?ref=rea-wpo-pp-details-tab)
 - [**WooCommerce Product Grid**](https://royal-elementor-addons.com/elementor-grid-widget-examples/?ref=rea-wpo-pp-details-tab#filter:category-woo-grid)
 - [**WooCommerce Product Carousel**](https://royal-elementor-addons.com/elementor-grid-widget-examples/product-carousel-examples/?ref=rea-wpo-pp-details-tab)
@@ -82,6 +83,7 @@ Comes with **100+ Elementor addons, 140+ Elementor Templates KIT (Growing Each W
 **Woocommerce Widgets:**
 
 - [**Advanced Woocommerce Product Grid**](https://royal-elementor-addons.com/elementor-grid-widget-examples/?ref=rea-wpo-pp-details-tab#filter:category-woo-grid)
+- [**Advanced Product Filters (Filter products by Color, brand, size etc)**](https://demosites.royal-elementor-addons.com/woo-advanced-filters-preview/preview-links/?ref=rea-wpo-pp-details-tab)
 - [**Woocommerce Product Wishlist & Compare Grid**](https://demosites.royal-elementor-addons.com/fashion-v2/shop-fashion-v2/?ref=rea-wpo-pp-details-tab)
 - [**Woocommerce Product Wishlist Page**](https://demosites.royal-elementor-addons.com/fashion-v2/wishlist-fashion-v2/?ref=rea-wpo-pp-details-tab)
 - [**Woocommerce Product Compare Page**](https://demosites.royal-elementor-addons.com/fashion-v2/compare-fashion-v2/?ref=rea-wpo-pp-details-tab)
@@ -114,6 +116,7 @@ Comes with **100+ Elementor addons, 140+ Elementor Templates KIT (Growing Each W
 
 - [**Elementor Theme Builder & Woocommerce Builder**](https://royal-elementor-addons.com/?ref=rea-wpo-pp-details-tab#headerfooterbuilder) - Header Footer Builder, Post & Product Archive builder, Single Post & Product builder, Single Page, Search, category, tags, 404, author, data page template builder.
 - [**Dynamic Website Builder**](https://www.youtube.com/watch?v=kE1zmi3fxh8) - Use Dynamic Tags to create Websites Driven by Dynamic Content. Create Custom Post Types and Custom Taxonomies. Style and customize Custom Fields, Custom Post Type & Custom Taxonomies Templates. Add Dynamic Product Data even for Woocommerce Archive Grid and Single Products Pages and much more. Supported Advanced Custom Fields: Text, Textarea, Number, Range, Email, URL, Password, Select, Checkbox, Radio Button, True / False, Gallery, Image, Repeater, File, Flexible Content, Clone, WYSIWYG Editor, oEmbed, Date Picker, Relationship, Taxonomy, Time Picker, Color Picker, Post Object, Accordion, Tab, Google Map. [View Dynamic Websites Prebuilt Demos](https://demosites.royal-elementor-addons.com/elementor-templates/#filter:category-dynamic)
+- [**Advanced Filters for Elementor**](https://demosites.royal-elementor-addons.com/woo-advanced-filters-preview/preview-links/) - Advanced Filters lets you filter any **Custom Post Types (CPT), Taxonomies and Metafields** in WordPress using Elementor. You can create filters like Price, Color, Brand, Size, Material, Rating or any other. Please watch this [Video Tutorial](https://www.youtube.com/watch?v=ejbvzt2BkJE) to learn more about it.
 - [**Mega Menu Builder**](https://royal-elementor-addons.com/elementor-mega-menu-widget/?ref=rea-wpo-pp-details-tab#popupbuilder?ref=rea-wpo-pp-details-tab#popupbuilder) - Build any type of WordPress mega menu with Menu Badges and Icons, use any elementor widgets in Mega menu content, supports Ajax loading of mega menu items for maximum page loading speed. Off-Canvas Mobile and Desktop Menus support.
 - [**Advanced Sticky Menu - Create eye-catching Sticky Header Effects**](https://prnt.sc/pCVM2ayA_vVV) check demos (scroll to see menu effects): 
 	[Demo 1 - Replace Header on Scroll, change it's background Color and make it Transparent, replace Logo ](https://demosites.royal-elementor-addons.com/construction-v3/?ref=rea-wpo-pp-details-tab)
@@ -143,7 +146,7 @@ and other custom branding related settings)
 - [**Furniture Store**](https://demosites.royal-elementor-addons.com/furniture-shop-v1/?ref=rea-wpo-pp-details-tab)
 - [**Food Delivery**](https://demosites.royal-elementor-addons.com/woo-food-v1/?ref=rea-wpo-pp-details-tab)
 - [**Ecommerce**](https://demosites.royal-elementor-addons.com/ecommerce-v1/?ref=rea-wpo-pp-details-tab)
-- [**View All Demos**](https://demosites.royal-elementor-addons.com/elementor-templates/?ref=rea-wpo-pp-details-tab)
+- [**+++++View All Demos +++++**](https://demosites.royal-elementor-addons.com/elementor-templates/?ref=rea-wpo-pp-details-tab)
 
 **Elementor Theme Builder Templates Kits**
 
@@ -158,7 +161,7 @@ and other custom branding related settings)
 - [**Magazine Blog V6**](https://demosites.royal-elementor-addons.com/magazine-blog-v6/?ref=rea-wpo-pp-details-tab)
 - [**Food Blog**](https://demosites.royal-elementor-addons.com/food-blog-v1/?ref=rea-wpo-pp-details-tab)
 - [**Travel Blog**](https://demosites.royal-elementor-addons.com/travel-blog-v1/?ref=rea-wpo-pp-details-tab)
-- [**View All Demos**](https://demosites.royal-elementor-addons.com/elementor-templates/?ref=rea-wpo-pp-details-tab)
+- [**+++++View All Demos +++++**](https://demosites.royal-elementor-addons.com/elementor-templates/?ref=rea-wpo-pp-details-tab)
 
 **Elementor Templates Kits**
 
@@ -232,7 +235,7 @@ and other custom branding related settings)
 - [**Coming Soon Kit v1**](https://demosites.royal-elementor-addons.com/coming-soon-pack-v1/?ref=rea-wpo-pp-details-tab)
 - [**Music Band v1**](https://demosites.royal-elementor-addons.com/music-band-v1/?ref=rea-wpo-pp-details-tab)
 - [**Dental v1**](https://demosites.royal-elementor-addons.com/dental-v1/?ref=rea-wpo-pp-details-tab)
-- [**View All Demos**](https://demosites.royal-elementor-addons.com/elementor-templates/?ref=rea-wpo-pp-details-tab)
+- [**+++++View All Demos +++++**](https://demosites.royal-elementor-addons.com/elementor-templates/?ref=rea-wpo-pp-details-tab)
 
 **How to Import Template Kit:**
 
@@ -453,6 +456,67 @@ post_max_size 64M
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/royal-elementor-addons)
 
 == Changelog ===
+= Royal Elementor Addons v1.7.1047 - 2026-02-03 =
+* ADDED: Elementor AI Support BOT Template Kit - [**AI Support BOT**](https://demosites.royal-elementor-addons.com/ai-support-bot-v1/?ref=rea-wpo-pp-details-tab).
+
+= Royal Elementor Addons v1.7.1046 - 2026-01-23 =
+* FIXED: Minor Bugs
+
+= Royal Elementor Addons v1.7.1045 - 2026-01-05 =
+* ADDED: Support for Royal Backup and Reset Plugin - [**Royal Backup and Reset Plugin**](https://wordpress.org/plugins/royal-backup-reset/#description).
+* FIXED: Advanced Filters minor issues with some Template Kits - See it in Action [**Advanced Filters Preview**](https://demosites.royal-elementor-addons.com/woo-advanced-filters-preview/preview-links/?ref=rea-wpo-pp-details-tab).
+
+= Royal Elementor Addons v1.7.1044 - 2026-01-04 =
+* ADDED: Elementor AI Image Generation Template Kit - [**AI Image Generation**](https://demosites.royal-elementor-addons.com/ai-image-v1/?ref=rea-wpo-pp-details-tab).
+* ADDED: Elementor AI SAAS Platform Template Kit - [**AI SAAS Platform**](https://demosites.royal-elementor-addons.com/ai-saas-v1//?ref=rea-wpo-pp-details-tab).
+* ADDED: Elementor Fast Food Restaurant Template Kit - [**Fast Food Restaurant**](https://demosites.royal-elementor-addons.com/fast-food-v1/?ref=rea-wpo-pp-details-tab).
+* FIXED: Advanced Filters minor issues with some Template Kits - See it in Action [**Advanced Filters Preview**](https://demosites.royal-elementor-addons.com/woo-advanced-filters-preview/preview-links/?ref=rea-wpo-pp-details-tab).
+
+= Royal Elementor Addons v1.7.1043 - 2025-12-29 =
+* FIXED: Advanced Filters minor issues with some Template Kits - See it in Action [**Advanced Filters Preview**](https://demosites.royal-elementor-addons.com/woo-advanced-filters-preview/preview-links/?ref=rea-wpo-pp-details-tab).
+* FIXED: Minor Bugs
+
+= Royal Elementor Addons v1.7.1042 - 2025-12-24 =
+* ADDED: Elementor Fashion (Shop) V5 Template Kit - [**Fashion**](https://demosites.royal-elementor-addons.com/fashion-v5/?ref=rea-wpo-pp-details-tab).
+* FIXED: Advanced Filters minor issues with some Template Kits - See it in Action [**Advanced Filters Preview**](https://demosites.royal-elementor-addons.com/woo-advanced-filters-preview/preview-links/?ref=rea-wpo-pp-details-tab).
+* FIXED: Minor Bugs
+
+= Royal Elementor Addons v1.7.1041 - 2025-11-25 =
+* FIXED: Advanced Filters minor issues with some Template Kits - See it in Action [**Advanced Filters Preview**](https://demosites.royal-elementor-addons.com/woo-advanced-filters-preview/preview-links/?ref=rea-wpo-pp-details-tab).
+* FIXED: Minor Bugs
+
+= Royal Elementor Addons v1.7.1040 - 2025-11-18 =
+* FIXED: Advanced Filters minor issues with some Template Kits - See it in Action [**Advanced Filters Preview**](https://demosites.royal-elementor-addons.com/woo-advanced-filters-preview/preview-links/?ref=rea-wpo-pp-details-tab).
+
+= Royal Elementor Addons v1.7.1039 - 2025-11-13 =
+* NEW: First Kit Where we have implemented Advanced Filters (Filter any type of CPT, Taxonomy and Metafields) - See it in Action [**Advanced Filters Preview 1**](https://demosites.royal-elementor-addons.com/fashion-v2/shop-fashion-v2/?ref=rea-wpo-pp-details-tab).
+* FIXED: Minor Bugs
+
+= Royal Elementor Addons v1.7.1038 - 2025-11-11 =
+* FIXED: Minor Bugs
+* ADDED: Advanced Filters widget to Filter any type of CPT, Taxonomy and Metafields.
+
+= Royal Elementor Addons v1.7.1037 - 2025-11-7 =
+* Fixed: Mobile menu click on desktop in Mega Menu.
+* Fixed: Minor vulnerability in Form Builder file upload action.
+* Fixed: Minor bugs in Grid and Mega Menu modules.
+* Fixed: Number of columns error in Advanced Slider widget.
+* Fixed: Minor sanitization-related vulnerability in Form Builder.
+* Added: Google Maps widget option to work without API Key.
+* Fixed: Randomize option duplicating posts in Magazine Grid.
+* Fixed: Lightbox popup minor bug in Media Grid.
+* Added: Title HTML tag option in Posts Timeline.
+* Added: Inline/Separate display option for Checkout buttons in Cart Page widget.
+* Fixed: Safari rendering bugs in Add to Cart widget.
+
+= Royal Elementor Addons v1.7.1036 - 2025-10-26 =
+* ADDED: Wooshop V2 - Elementor Template Kit [**Wooshop V2**](https://demosites.royal-elementor-addons.com/wooshop-v2/?ref=rea-wpo-pp-details-tab).
+* ADDED: Real Estate Consultant - Elementor Template Kit [**Real Estate Consultant**](https://demosites.royal-elementor-addons.com/real-estate-consultant-v1/?ref=rea-wpo-pp-details-tab).
+
+= Royal Elementor Addons v1.7.1035 - 2025-10-8 =
+* ADDED: Life Coach V1 - Elementor Template Kit - [**Life Coach V1**](https://demosites.royal-elementor-addons.com/life-coaching-v1/?ref=rea-wpo-pp-details-tab).
+* ADDED: Day Care Services V1 - Elementor Template Kit - [**Day Care Services V1**](https://demosites.royal-elementor-addons.com/day-care-service-v1/?ref=rea-wpo-pp-details-tab).
+
 = Royal Elementor Addons v1.7.1034 - 2025-9-19 =
 * ADDED: Healthy Coaching V2 - Elementor Template Kit - [**Healthy Coaching V2**](https://demosites.royal-elementor-addons.com/healthy-coaching-v1/?ref=rea-wpo-pp-details-tab).
 

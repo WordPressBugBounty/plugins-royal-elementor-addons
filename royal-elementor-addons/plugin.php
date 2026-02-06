@@ -101,18 +101,18 @@ class Plugin {
 
 		// Twitter
 		require WPR_ADDONS_PATH . 'classes/modules/wpr-load-more-tweets.php';
-
+		
 		// Meta Keys
 		require WPR_ADDONS_PATH . 'classes/wpr-custom-meta-keys.php';
 
 		// Grid
-		require WPR_ADDONS_PATH . 'classes/modules/wpr-filter-grid-posts.php';
+		require WPR_ADDONS_PATH . 'classes/modules/wpr-grid-helpers.php';
+		
+		// Woo Grid
+		require WPR_ADDONS_PATH . 'classes/modules/wpr-woo-grid-helpers.php';
 
 		// Media Grid
 		require WPR_ADDONS_PATH . 'classes/modules/wpr-filter-grid-media.php';
-
-		// Woo Grid
-		require WPR_ADDONS_PATH . 'classes/modules/wpr-filter-woo-products.php';
 
 		// Particles
 		if ( 'on' === get_option('wpr-particles', 'on') ) {//TODO: make this check automatic(loop through) for all extensions
@@ -165,6 +165,9 @@ class Plugin {
 			// Dropdown Category Filter for Wpr Templates
 			require WPR_ADDONS_PATH . 'admin/includes/wpr-templates-category-filter.php';
 
+			// Editor Hooks
+			require WPR_ADDONS_PATH . 'admin/includes/wpr-editor-hooks.php';
+
 			// Hide Theme Notice
 			// TODO: Remove this and fix with Transients
 			add_action( 'admin_enqueue_scripts', [ $this, 'hide_theme_notice' ] );
@@ -172,7 +175,8 @@ class Plugin {
 
 		if ( class_exists('WooCommerce') ) {
 			 if ( 'on' === get_option('wpr_override_woo_templates', 'on') ) {
-				 require WPR_ADDONS_PATH . 'includes/woocommerce/woocommerce-config.php';
+				// add_filter( 'astra_enable_woocommerce_integration', '__return_false' );
+				require WPR_ADDONS_PATH . 'includes/woocommerce/woocommerce-config.php';
 			 }
 
 			// Add Remove From Wishlist
@@ -352,6 +356,13 @@ class Plugin {
 		wp_register_style(
 			'wpr-flipster-css',
 			WPR_ADDONS_URL . 'assets/css/lib/flipster/jquery.flipster.min.css',
+			[],
+			Plugin::instance()->get_version()
+		);
+
+		wp_register_style(
+			'wpr-date-picker-css',
+			WPR_ADDONS_URL . 'assets/css/lib/air-datepicker/air-datepicker.css',
 			[],
 			Plugin::instance()->get_version()
 		);
@@ -613,14 +624,35 @@ class Plugin {
 			'3.0.5',
 			true
 		);
+		
+		wp_register_script(
+			'imagesloaded',
+			WPR_ADDONS_URL . 'assets/js/lib/isotope/imagesloaded'. $this->script_suffix() .'.js',
+			[
+				'jquery'
+			],
+			'5.0.0',
+			true
+		);
 
 		wp_register_script(
 			'wpr-isotope',
 			WPR_ADDONS_URL . 'assets/js/lib/isotope/isotope'. $this->script_suffix() .'.js',
 			[
 				'jquery',
+				'imagesloaded'
 			],
 			'3.0.8',
+			true
+		);
+
+		wp_register_script(
+			'wpr-date-picker-js',
+			WPR_ADDONS_URL . 'assets/js/lib/air-datepicker/air-datepicker.js',
+			[
+				'jquery',
+			],
+			'',
 			true
 		);
 
@@ -1036,6 +1068,12 @@ class Plugin {
 					'icon' => 'wpr-icon eicon-database',
 					'categories' => '["'. $category .'"]',
 				],
+				[
+					'name' => 'wpr-advanced-filters',
+					'title' => __('Advanced Filters', 'wpr-addons'),
+					'icon' => 'wpr-icon eicon-filter',
+					'categories' => '["'. $category .'"]',
+				],
 			];
 
 			$config['promotionWidgets'] = array_merge( $config['promotionWidgets'], $expert_widgets );
@@ -1091,7 +1129,7 @@ class Plugin {
 
 		// Promote Premium Widgets
 		if ( current_user_can('administrator') ) {
-			add_filter('elementor/editor/localize_settings', [$this, 'promote_premium_widgets']);
+			add_filter('elementor/editor/localize_settings', [$this, 'promote_premium_widgets'], 999);
 		}
 
 		add_filter( 'pre_get_posts', [$this, 'wpr_custom_posts_per_page'] );
