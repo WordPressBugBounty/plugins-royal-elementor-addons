@@ -42,6 +42,20 @@ class WPR_Templates_Data {
 					'priority' => 10,
 				],
 			],
+			'logistic' => [
+				'v1' => [
+					'name' => 'Logistic V1',
+					'pages' => 'home,services,about-us,gallery,blog,single-blog,contact,',
+					'plugins' => '{}',
+					'tags' => 'free logistics delivery global supply warehouse distribution shipment transportation service cargo freight packaging shipping trucking trucks business corporate trailer relocation warehous',
+					'theme-builder' => true,
+					'woo-builder' => false,
+					'off-canvas' => true,
+					'price' => $is_pro_active ? 'free' : 'free',
+					'label' => 'new',
+					'priority' => 20,
+				],
+			],
 			'christmas' => [
 				'v1' => [
 					'name' => 'Christmas V1(Shop)',
@@ -2409,6 +2423,12 @@ class WPR_Templates_Data {
 				'pages' => ['home','about','our-services','our-process','our-clients','pricing-plans','projects','project-details','faq','blog','contact',],
 				'preview' => ['home','about','our-services','our-process','our-clients','pricing-plans','projects','project-details','faq','blog','contact',],
 				'price' => $is_pro_active ? 'free' : 'pro',
+			],
+			'logistic-v1' => [
+				'name' => 'Logistic V1',
+				'pages' => ['home','services','about-us','gallery','blog','contact'],
+				'preview' => ['home','services','about-us','gallery','blog','contact'],
+				'price' => $is_pro_active ? 'free' : 'free',
 			],
 			'travel-blog-v1' => [
 				'name' => 'Travel Blog',
