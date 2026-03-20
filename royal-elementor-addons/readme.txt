@@ -1,9 +1,9 @@
 === Royal Addons for Elementor – Addons and Templates Kit for Elementor ===
 Contributors: wproyal, rubeushagrid13, cyberpinky, elementoraddonswpr, ggedenidze1982, wprduke
 Tags: elementor, elementor templates, elementor addons, elementor widgets, header footer builder, elementor mega menu, elementor woocommerce builder, theme builder, header footer builder, elementor post grid, elementor product grid, addons for elementor
-Stable tag: 1.7.1051
+Stable tag: 1.7.1052
 Requires at least: 5.0
-Tested up to: 6.9.1
+Tested up to: 6.9.4
 Requires PHP: 5.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -481,6 +481,9 @@ post_max_size 64M
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/royal-elementor-addons)
 
 == Changelog ===
+= Royal Elementor Addons v1.7.1052 - 2026-03-20 =
+* ADDED: Elementor Template Kit: Crypto Trade V1 - [**Crypto-Trade V4**](https://demosites.royal-elementor-addons.com/crypto-trade-v1/?ref=rea-wpo-pp-details-tab).
+
 = Royal Elementor Addons v1.7.1051 - 2026-03-09 =
 * ADDED: A Widget Builder that helps you easily create custom widgets for Elementor
 
