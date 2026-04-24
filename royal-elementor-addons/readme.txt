@@ -1,7 +1,7 @@
 === Royal Addons for Elementor – Addons and Templates Kit for Elementor ===
 Contributors: wproyal, rubeushagrid13, cyberpinky, elementoraddonswpr, ggedenidze1982, wprduke
 Tags: elementor, elementor templates, elementor addons, elementor widgets, header footer builder, elementor mega menu, elementor woocommerce builder, theme builder, header footer builder, elementor post grid, elementor product grid, addons for elementor
-Stable tag: 1.7.1057
+Stable tag: 1.7.1058
 Requires at least: 5.0
 Tested up to: 6.9.4
 Requires PHP: 5.6
@@ -484,7 +484,29 @@ post_max_size 64M
 
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/royal-elementor-addons)
 
+== Screenshots ==
+
+1. Elementor Template Kit Library - 200+ Kits
+2. Elementor Widgets
+3. Theme Builder
+4. Elementor Extensions
+5. Post/Product/CPT Grid Builder
+6. Mega Menu Builder
+7. Advanced Filters for any CPT 1
+8. Advanced Filters for any CPT 2
+9. WooCommerce Widgets
+10. Live AJAX Search
+11. Form Builder
+12. Dynamic Website Builder - Custom Fields and More
+13. Popup Builder
+14. Elementor Widget Builder
+15. Elementor Premade Blocks
+
 == Changelog ===
+= Royal Elementor Addons v1.7.1058 - 2026-04-24 =
+* FIXED: Minor Issues
+* ADDED: Elementor Template Kit: Hotel V2 - [**Hotel V5**](hhttps://demosites.royal-elementor-addons.com/hotel-v2/?ref=rea-wpo-pp-details-tab).
+
 = Royal Elementor Addons v1.7.1057 - 2026-04-03 =
 * FIXED: Minor Issues
 * ADDED: Elementor Template Kit: Real Estate V5 - [**Real Estate V5**](https://demosites.royal-elementor-addons.com/realestate-v5/?ref=rea-wpo-pp-details-tab).
@@ -498,7 +520,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * FIXED: REA Widgets Compatibility with Elementor Tabs Widget
 * FIXED: Instagram Minor Vulnerebilities
 
-= Royal Elementor Addons v1.7.1056 - 2026-04-03 =
+= Royal Elementor Addons v1.7.1056 - 2026-04-05 =
 * FIXED: Minor Issues
 
 = Royal Elementor Addons v1.7.1054 - 2026-04-02 =

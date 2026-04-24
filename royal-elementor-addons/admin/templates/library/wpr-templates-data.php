@@ -831,7 +831,7 @@ class WPR_Templates_Data {
 			],
 			'hotel' => [
 				'v1' => [
-					'name' => 'Hotel',
+					'name' => 'Hotel V1',
 					'pages' => 'home,dining,rooms,services,history,gallery,contact,',
 					'plugins' => '{"media-library-assistant":'. $is_mla_active .'}',
 					'tags' => 'hotel motel rooms apartment guest house budget hotel lodge lodging resort bnb accommodation resort travel tourism luxury hotel',
@@ -840,6 +840,18 @@ class WPR_Templates_Data {
 					'off-canvas' => false,
 					'price' => $is_pro_active ? 'free' : 'pro',
 					'label' => '',
+					'priority' => 120,
+				],
+				'v2' => [
+					'name' => 'Hotel V2',
+					'pages' => 'home,about,rooms,single-room,services,events,blog,single-blog,contact,',
+					'plugins' => '{}',
+					'tags' => 'hotel rooms apartment resort bnb accommodation tourism luxury hotel booking reservation travel vacation rent trip suites hospitality guest service wellness spa ',
+					'theme-builder' => true,
+					'woo-builder' => false,
+					'off-canvas' => false,
+					'price' => $is_pro_active ? 'free' : 'pro',
+					'label' => 'new',
 					'priority' => 20,
 				],
 			],
@@ -2827,9 +2839,15 @@ class WPR_Templates_Data {
 				'price' => $is_pro_active ? 'free' : 'free	',
 			],
 			'hotel-v1' => [
-				'name' => 'Hotel',
+				'name' => 'Hotel V1',
 				'pages' => ['home','dining','rooms','services','history','gallery','contact'],
 				'preview' => ['home','dining','rooms','services','history','gallery','contact'],
+				'price' => $is_pro_active ? 'free' : 'pro',
+			],
+			'hotel-v2' => [
+				'name' => 'Hotel V2',
+				'pages' => ['home','about','rooms','single-room','services','events','blog','contact'],
+				'preview' => ['home','about','rooms','single-room','services','events','blog','contact'],
 				'price' => $is_pro_active ? 'free' : 'pro',
 			],
 			'digital-seo-marketing-agency-v1' => [
