@@ -128,10 +128,13 @@ class WPR_Render_Templates {
 
 			if ( defined('ICL_LANGUAGE_CODE') ) {
 				$default_language_code = apply_filters('wpml_default_language', null);
-				$current_language_code = apply_filters( 'wpml_current_language', NULL );
+				$current_language_code = apply_filters('wpml_current_language', null);
 
-				IF ( ICL_LANGUAGE_CODE !== $default_language_code ) {
-					$template_id = apply_filters('wpml_object_id', $template_id, 'wpr_templates', true, $default_language_code);
+				if ( $current_language_code && $current_language_code !== $default_language_code ) {
+					$translated_id = apply_filters('wpml_object_id', $template_id, 'wpr_templates', true, $current_language_code);
+					if ( $translated_id && (int) $translated_id !== (int) $template_id ) {
+						$template_id = $translated_id;
+					}
 				}
 			}
 
@@ -139,7 +142,7 @@ class WPR_Render_Templates {
 
 			// if ( !empty($show_on_canvas) && 'true' === $show_on_canvas && 0 === strpos($template_slug, 'user-header-') ) {
 			if ( !empty($show_on_canvas) && 'true' === $show_on_canvas && !is_null($template_slug) ) {
-				Utilities::render_elementor_template($template_slug);
+				Utilities::render_elementor_template($template_slug, $template_id);
 			}
 		}
     }
@@ -174,10 +177,13 @@ class WPR_Render_Templates {
 
 			if ( defined('ICL_LANGUAGE_CODE') ) {
 				$default_language_code = apply_filters('wpml_default_language', null);
-				$current_language_code = apply_filters( 'wpml_current_language', NULL );
+				$current_language_code = apply_filters('wpml_current_language', null);
 
-				IF ( ICL_LANGUAGE_CODE !== $default_language_code ) {
-					$template_id = apply_filters('wpml_object_id', $template_id, 'wpr_templates', true, $default_language_code);
+				if ( $current_language_code && $current_language_code !== $default_language_code ) {
+					$translated_id = apply_filters('wpml_object_id', $template_id, 'wpr_templates', true, $current_language_code);
+					if ( $translated_id && (int) $translated_id !== (int) $template_id ) {
+						$template_id = $translated_id;
+					}
 				}
 			}
 
@@ -185,7 +191,7 @@ class WPR_Render_Templates {
 
 			// if ( !empty($show_on_canvas) && 'true' === $show_on_canvas && 0 === strpos($template_slug, 'user-footer-') ) {
 			if ( !empty($show_on_canvas) && 'true' === $show_on_canvas && !is_null($template_slug) ) {
-				Utilities::render_elementor_template($template_slug);
+				Utilities::render_elementor_template($template_slug, $template_id);
 			}
 		}
     }
