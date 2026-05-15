@@ -1834,6 +1834,17 @@ class Wpr_Data_Table extends Widget_Base {
 			}
 
 			$url = $validated_url;
+		} else {
+			$validated_upload_url = $this->wpr_validate_uploaded_csv_url(
+				isset( $settings['table_upload_csv'] ) ? $settings['table_upload_csv'] : []
+			);
+
+			if ( is_wp_error( $validated_upload_url ) ) {
+				echo '<p class="wpr-no-csv-file-found">' . esc_html( $validated_upload_url->get_error_message() ) . '</p>';
+				return \ob_get_clean();
+			}
+
+			$url = $validated_upload_url;
 		}
 
 		if ( ! empty( $url ) ) {
@@ -2010,16 +2021,80 @@ class Wpr_Data_Table extends Widget_Base {
 			return $handle;
 		}
 
-		if ( ! is_readable( $source ) ) {
-			return new \WP_Error( 'wpr_csv_local_not_readable', esc_html__( 'Please provide a valid CSV file.', 'wpr-addons' ) );
+		$canonical_source = realpath( $source );
+		if ( false === $canonical_source ) {
+			return new \WP_Error( 'wpr_csv_local_invalid_path', esc_html__( 'Please provide a valid CSV file.', 'wpr-addons' ) );
 		}
 
-		$handle = fopen( $source, 'r' );
+		$uploads = wp_upload_dir();
+		$uploads_base = isset( $uploads['basedir'] ) ? realpath( $uploads['basedir'] ) : false;
+		if ( false === $uploads_base ) {
+			return new \WP_Error( 'wpr_csv_uploads_missing', esc_html__( 'Could not validate the CSV upload directory.', 'wpr-addons' ) );
+		}
+
+		$normalized_source = wp_normalize_path( $canonical_source );
+		$normalized_uploads_base = trailingslashit( wp_normalize_path( $uploads_base ) );
+		if ( 0 !== strpos( $normalized_source, $normalized_uploads_base ) ) {
+			return new \WP_Error( 'wpr_csv_local_outside_uploads', esc_html__( 'CSV file must be located in the uploads directory.', 'wpr-addons' ) );
+		}
+
+		$sanitized_filename = sanitize_file_name( wp_basename( $normalized_source ) );
+		$file_extension = strtolower( pathinfo( $sanitized_filename, PATHINFO_EXTENSION ) );
+		if ( 'csv' !== $file_extension ) {
+			return new \WP_Error( 'wpr_csv_local_invalid_extension', esc_html__( 'Only CSV files are allowed.', 'wpr-addons' ) );
+		}
+
+		if ( ! is_readable( $canonical_source ) ) {
+			return new \WP_Error( 'wpr_csv_local_not_readable', esc_html__( 'Could not read the CSV file.', 'wpr-addons' ) );
+		}
+
+		$handle = fopen( $canonical_source, 'r' );
 		if ( false === $handle ) {
 			return new \WP_Error( 'wpr_csv_local_open_failed', esc_html__( 'Could not open the CSV file.', 'wpr-addons' ) );
 		}
 
 		return $handle;
+	}
+
+	protected function wpr_validate_uploaded_csv_url( $media_setting ) {
+		if ( ! is_array( $media_setting ) ) {
+			return new \WP_Error( 'wpr_csv_invalid_upload', esc_html__( 'Please provide a valid CSV file.', 'wpr-addons' ) );
+		}
+
+		$attachment_id = isset( $media_setting['id'] ) ? absint( $media_setting['id'] ) : 0;
+		if ( $attachment_id <= 0 ) {
+			return new \WP_Error( 'wpr_csv_missing_attachment', esc_html__( 'Please select a CSV file from the media library.', 'wpr-addons' ) );
+		}
+
+		$attachment_file = get_attached_file( $attachment_id );
+		if ( ! is_string( $attachment_file ) || '' === trim( $attachment_file ) ) {
+			return new \WP_Error( 'wpr_csv_invalid_attachment', esc_html__( 'Please select a valid CSV file from the media library.', 'wpr-addons' ) );
+		}
+
+		$canonical_attachment_path = realpath( $attachment_file );
+		if ( false === $canonical_attachment_path ) {
+			return new \WP_Error( 'wpr_csv_invalid_attachment_path', esc_html__( 'Could not resolve the selected CSV file.', 'wpr-addons' ) );
+		}
+
+		$uploads = wp_upload_dir();
+		$uploads_base = isset( $uploads['basedir'] ) ? realpath( $uploads['basedir'] ) : false;
+		if ( false === $uploads_base ) {
+			return new \WP_Error( 'wpr_csv_uploads_missing', esc_html__( 'Could not validate the CSV upload directory.', 'wpr-addons' ) );
+		}
+
+		$normalized_attachment_path = wp_normalize_path( $canonical_attachment_path );
+		$normalized_uploads_base = trailingslashit( wp_normalize_path( $uploads_base ) );
+		if ( 0 !== strpos( $normalized_attachment_path, $normalized_uploads_base ) ) {
+			return new \WP_Error( 'wpr_csv_attachment_outside_uploads', esc_html__( 'The selected file must be located in the uploads directory.', 'wpr-addons' ) );
+		}
+
+		$sanitized_filename = sanitize_file_name( wp_basename( $normalized_attachment_path ) );
+		$file_extension = strtolower( pathinfo( $sanitized_filename, PATHINFO_EXTENSION ) );
+		if ( 'csv' !== $file_extension ) {
+			return new \WP_Error( 'wpr_csv_invalid_upload_extension', esc_html__( 'Only CSV files are allowed.', 'wpr-addons' ) );
+		}
+
+		return $canonical_attachment_path;
 	}
 
 	protected function wpr_validate_remote_csv_url( $url ) {
