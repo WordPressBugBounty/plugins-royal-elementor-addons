@@ -1,7 +1,7 @@
 === Royal Addons for Elementor – Addons and Templates Kit for Elementor ===
 Contributors: wproyal, rubeushagrid13, cyberpinky, elementoraddonswpr, ggedenidze1982, wprduke
 Tags: elementor, elementor templates, elementor addons, elementor widgets, header footer builder, elementor mega menu, elementor woocommerce builder, theme builder, header footer builder, elementor post grid, elementor product grid, addons for elementor
-Stable tag: 1.7.1061
+Stable tag: 1.7.1062
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 5.6
@@ -503,6 +503,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 15. Elementor Premade Blocks
 
 == Changelog ===
+= Royal Elementor Addons v1.7.1062 - 2026-05-22 =
+* ADDED: Elementor Template Kit: School V2 - [**School V2**](https://demosites.royal-elementor-addons.com/school-v2/?ref=rea-wpo-pp-details-tab).
+
 = Royal Elementor Addons v1.7.1061 - 2026-05-20 =
 * TESTED:Tested up to new WP 7.0
 
@@ -518,7 +521,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = Royal Elementor Addons v1.7.1058 - 2026-04-24 =
 * FIXED: Minor Issues
-* ADDED: Elementor Template Kit: Hotel V2 - [**Hotel V5**](hhttps://demosites.royal-elementor-addons.com/hotel-v2/?ref=rea-wpo-pp-details-tab).
+* ADDED: Elementor Template Kit: Hotel V2 - [**Hotel V5**](https://demosites.royal-elementor-addons.com/hotel-v2/?ref=rea-wpo-pp-details-tab).
 
 = Royal Elementor Addons v1.7.1057 - 2026-04-03 =
 * FIXED: Minor Issues
