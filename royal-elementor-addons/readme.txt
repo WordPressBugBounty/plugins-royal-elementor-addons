@@ -1,7 +1,7 @@
 === Royal Addons for Elementor – Addons and Templates Kit for Elementor ===
 Contributors: wproyal, rubeushagrid13, cyberpinky, elementoraddonswpr, ggedenidze1982, wprduke
 Tags: elementor, elementor templates, elementor addons, elementor widgets, header footer builder, elementor mega menu, elementor woocommerce builder, theme builder, header footer builder, elementor post grid, elementor product grid, addons for elementor
-Stable tag: 1.7.1063
+Stable tag: 1.7.1064
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 5.6
@@ -503,6 +503,10 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 15. Elementor Premade Blocks
 
 == Changelog ===
+= Royal Elementor Addons v1.7.1064 - 2026-06-25 =
+* ADDED: Elementor Template Kit: Jewelry V3 - [**Jewelry V3**](https://demosites.royal-elementor-addons.com/jewelry-v3/?ref=rea-wpo-pp-details-tab).
+* ADDED: Elementor Template Kit: Skincare V2 - [**Skincare V2**](https://demosites.royal-elementor-addons.com/skincare-v2//?ref=rea-wpo-pp-details-tab).
+
 = Royal Elementor Addons v1.7.1063 - 2026-06-08 =
 * FIXED: Minor Vulnerebilities
 * FIXED: Minor Bugs
