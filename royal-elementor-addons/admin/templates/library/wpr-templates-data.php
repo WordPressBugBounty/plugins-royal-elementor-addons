@@ -7,8 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class WPR_Templates_Data {
 	public static function get_available_kits() {
-		$is_pro_active = defined('WPR_ADDONS_PRO_VERSION') && wpr_fs()->can_use_premium_code();
-		$is_expert = $is_pro_active && wpr_fs()->is_plan( 'expert' );
+		$is_pro_active = false;
+		$is_expert = false;
 		$is_cf7_active = is_plugin_active('contact-form-7/wp-contact-form-7.php') ? 'true' : 'false';
 		$is_mla_active = is_plugin_active('media-library-assistant/index.php') ? 'true' : 'false';
 		$is_woo_active = is_plugin_active('woocommerce/woocommerce.php') ? 'true' : 'false';
@@ -709,6 +709,18 @@ class WPR_Templates_Data {
 					'label' => 'new',
 					'priority' => 3,
 				],
+				'v3' => [
+					'name' => 'Woo Shop V3',
+					'pages' => 'home,shop,single-product,cart,checkout,about,contact,',
+					'plugins' => '{"woocommerce":'. $is_woo_active .'}',
+					'tags' => 'free shop shopping woo-commerce woocommerce estore ecommerce shop ecommerce product online shop online store boutique clothes eshopping fashion designer market reseller digital purchases e commerce black friday',
+					'theme-builder' => true,
+					'woo-builder' => true,
+					'off-canvas' => false,
+					'price' => $is_pro_active ? 'free' : 'free',
+					'label' => 'new',
+					'priority' => 3,
+				],
 			],
 			'shop-wooshop' => [
 				'v2' => [
@@ -722,6 +734,20 @@ class WPR_Templates_Data {
 					'price' => $is_pro_active ? 'free' : 'pro',
 					'label' => 'New',
 					'priority' => 4,
+				],
+			],
+			'product-showcase' => [
+				'v1' => [
+					'name' => 'Product Showcase V1',
+					'pages' => 'home,overview,features,technology,design,review,pricing',
+					'plugins' => '{}',
+					'tags' => 'single page landing page one page onepage landingpage products product showcase modern catalog features attributes reviews rating testimonial technology woocommerce shop woo shopping headphones parallax',
+					'theme-builder' => true,
+					'woo-builder' => false,
+					'off-canvas' => true,
+					'price' => $is_pro_active ? 'free' : 'pro',
+					'label' => 'new',
+					'priority' => 50,
 				],
 			],
 			'cosmetic' => [
@@ -853,6 +879,18 @@ class WPR_Templates_Data {
 					'price' => $is_pro_active ? 'free' : 'pro',
 					'label' => 'new',
 					'priority' => 20,
+				],
+				'v3' => [
+					'name' => 'Hotel V3',
+					'pages' => 'home,about,rooms-1,rooms-2,room-single,services,spa-wellness,restaurant,gallery,faq,blog,single-blog,contact,',
+					'plugins' => '{}',
+					'tags' => 'hotel rooms apartment resort bnb accommodation tourism luxury hotel booking reservation travel vacation rent trip suites hospitality guest service wellness spa ',
+					'theme-builder' => true,
+					'woo-builder' => false,
+					'off-canvas' => true,
+					'price' => $is_pro_active ? 'free' : 'pro',
+					'label' => 'new',
+					'priority' => 19,
 				],
 			],
 			'fitness-gym' => [
@@ -1151,6 +1189,18 @@ class WPR_Templates_Data {
 					'label' => 'new',
 					'priority' => 2,
 				],
+				'v5' => [
+					'name' => 'Digital Marketing Agency v5',
+					'pages' => 'home,about,services,single-project,work-process,team,faq,blog,single-blog,contact,',
+					'plugins' => '{}',
+					'tags' => 'digital agency portfolio creative branding business company corporate digital services office agency web digital marketing content seo social media branding',
+					'theme-builder' => true,
+					'woo-builder' => false,
+					'off-canvas' => true,
+					'price' => $is_pro_active ? 'free' : 'pro',
+					'label' => 'new',
+					'priority' => 2,
+				],
 			],
 			'digital-seo-marketing-agency' => [
 				'v1' => [
@@ -1373,7 +1423,7 @@ class WPR_Templates_Data {
 					'name' => 'Car Rent',
 					'pages' => 'home,cars,car-details,about,contact,',
 					'plugins' => '{"woocommerce":'. $is_woo_active .'}',
-					'tags' => 'expert car rental service driver rent car delivery jorney luxary airport transfer car booking car hire',
+					'tags' => 'expert car rental service driver rent car delivery jorney luxary journey luxury airport transfer car booking car hire',
 					'theme-builder' => true,
 					'woo-builder' => true,
 					'off-canvas' => false,
@@ -2324,6 +2374,12 @@ class WPR_Templates_Data {
 				'preview' => ['home','about','services','service-details','team','portfolio','faq','blog','contact'],
 				'price' => $is_pro_active ? 'free' : 'pro',
 			],
+			'digital-marketing-agency-v5' => [
+				'name' => 'Digital Marketing Agency v5',
+				'pages' => ['home','about','services','single-project','work-process','team','faq','blog','contact'],
+				'preview' => ['home','about','services','single-project','work-process','team','faq','blog','contact'],
+				'price' => $is_pro_active ? 'free' : 'pro',
+			],
 			'fashion-v2' => [
 				'name' => 'Fashion',
 				'pages' => ['home','home-v2','home-v3','shop-v1','shop-v2','shop-v3','blog','about-v1','about-v2','contact-v1','contact-v2','contact-v3',],
@@ -2642,6 +2698,12 @@ class WPR_Templates_Data {
 				'preview' => ['home','shop','cart','blog','about','contact'],
 				'price' => $is_pro_active ? 'free' : 'free',
 			],
+			'wooshop-v3' => [
+				'name' => 'Woo Shop V3',
+				'pages' => ['home','shop','cart','checkout','about','contact'],
+				'preview' => ['home','shop','cart','checkout','about','contact'],
+				'price' => $is_pro_active ? 'free' : 'free',
+			],
 			'fashion-v1' => [
 				'name' => 'Fashion',
 				'pages' => ['home','shop-v1','shop-v2','blog','about','faq','contact'],
@@ -2892,6 +2954,12 @@ class WPR_Templates_Data {
 				'name' => 'Hotel V2',
 				'pages' => ['home','about','rooms','single-room','services','events','blog','contact'],
 				'preview' => ['home','about','rooms','single-room','services','events','blog','contact'],
+				'price' => $is_pro_active ? 'free' : 'pro',
+			],
+			'hotel-v3' => [
+				'name' => 'Hotel V3',
+				'pages' => ['home','about','rooms-1','rooms-2','room-single','services','spa-wellness','restaurant','gallery','faq','blog','contact'],
+				'preview' => ['home','about','rooms-1','rooms-2','room-single','services','spa-wellness','restaurant','gallery','faq','blog','contact'],
 				'price' => $is_pro_active ? 'free' : 'pro',
 			],
 			'digital-seo-marketing-agency-v1' => [
