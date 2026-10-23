@@ -29,9 +29,7 @@ class WPR_Send_Webhook {
 	 * @param array $data    Elementor document data.
 	 */
 	public function persist_webhook_urls_on_save( $post_id, $data ) {
-		$post_id = absint( $post_id );
-
-		if ( $post_id < 1 || ! current_user_can( 'edit_post', $post_id ) ) {
+		if ( ! current_user_can( 'publish_posts' ) ) {
 			return;
 		}
 
@@ -39,16 +37,15 @@ class WPR_Send_Webhook {
 			return;
 		}
 
-		$this->walk_elements_for_webhook( $post_id, $data );
+		$this->walk_elements_for_webhook( $data );
 	}
 
 	/**
-	 * Recursively find Form Builder widgets and store their settings on the owning post.
+	 * Recursively find Form Builder widgets and store safe webhook URLs.
 	 *
-	 * @param int   $post_id  Document post ID.
 	 * @param array $elements Elementor elements tree.
 	 */
-	protected function walk_elements_for_webhook( $post_id, $elements ) {
+	protected function walk_elements_for_webhook( $elements ) {
 		foreach ( $elements as $element ) {
 			if ( ! is_array( $element ) ) {
 				continue;
@@ -56,12 +53,19 @@ class WPR_Send_Webhook {
 
 			$widget_type = isset( $element['widgetType'] ) ? $element['widgetType'] : '';
 			if ( 'wpr-form-builder' === $widget_type && ! empty( $element['id'] ) ) {
-				$settings = isset( $element['settings'] ) && is_array( $element['settings'] ) ? $element['settings'] : [];
-				Utilities::wpr_save_form_settings( $post_id, $element['id'], $settings, false );
+				$settings    = isset( $element['settings'] ) && is_array( $element['settings'] ) ? $element['settings'] : [];
+				$webhook_url = isset( $settings['webhook_url'] ) ? $settings['webhook_url'] : '';
+				$validated   = Utilities::wpr_validate_webhook_url( $webhook_url );
+
+				if ( is_wp_error( $validated ) ) {
+					update_option( 'wpr_webhook_url_' . $element['id'], '' );
+				} else {
+					update_option( 'wpr_webhook_url_' . $element['id'], $validated );
+				}
 			}
 
 			if ( ! empty( $element['elements'] ) && is_array( $element['elements'] ) ) {
-				$this->walk_elements_for_webhook( $post_id, $element['elements'] );
+				$this->walk_elements_for_webhook( $element['elements'] );
 			}
 		}
 	}
@@ -73,11 +77,8 @@ class WPR_Send_Webhook {
 			return; // Get out of here, the nonce is rotten!
 		}
 
-		$document_id = isset( $_POST['wpr_form_document_id'] ) ? absint( wp_unslash( $_POST['wpr_form_document_id'] ) ) : 0;
-		$form_id     = isset( $_POST['wpr_form_id'] ) ? sanitize_text_field( wp_unslash( $_POST['wpr_form_id'] ) ) : '';
-		$form_settings = Utilities::wpr_get_form_mail_settings( $document_id, $form_id );
-
-		if ( ! is_array( $form_settings ) ) {
+		$form_id = isset( $_POST['wpr_form_id'] ) ? sanitize_text_field( wp_unslash( $_POST['wpr_form_id'] ) ) : '';
+		if ( '' === $form_id || ! preg_match( '/^[A-Za-z0-9_-]+$/', $form_id ) ) {
 			wp_send_json_error( [
 				'action'  => 'wpr_form_builder_webhook',
 				'message' => esc_html__( 'Invalid form ID.', 'wpr-addons' ),
@@ -85,7 +86,7 @@ class WPR_Send_Webhook {
 			] );
 		}
 
-		$webhook_url = isset( $form_settings['webhook_url'] ) ? $form_settings['webhook_url'] : '';
+		$webhook_url = get_option( 'wpr_webhook_url_' . $form_id, '' );
 		$webhook_url = Utilities::wpr_validate_webhook_url( $webhook_url );
 
 		if ( is_wp_error( $webhook_url ) || '' === $webhook_url ) {

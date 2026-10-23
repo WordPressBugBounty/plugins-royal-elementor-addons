@@ -1420,7 +1420,7 @@ class Wpr_Mailchimp extends Widget_Base {
 
 		?>
 
-		<form class="wpr-mailchimp-form" id="wpr-mailchimp-form-<?php echo esc_attr( $this->get_id() ); ?>" method="POST" data-list-id="<?php echo esc_attr($settings['maichimp_audience']); ?>" data-widget-id="<?php echo esc_attr( $this->get_id() ); ?>" data-document-id="<?php echo esc_attr( Utilities::wpr_get_current_document_id() ); ?>" data-clear-fields="<?php echo $clear_fields_on_submit; ?>">
+		<form class="wpr-mailchimp-form" id="wpr-mailchimp-form-<?php echo esc_attr( $this->get_id() ); ?>" method="POST" data-list-id="<?php echo esc_attr($settings['maichimp_audience']); ?>" data-clear-fields="<?php echo $clear_fields_on_submit; ?>">
 			<!-- Form Header -->
 			<?php if ( 'yes' === $settings['show_form_header'] ) : ?>
 			<div class="wpr-mailchimp-header">

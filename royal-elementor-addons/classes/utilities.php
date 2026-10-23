@@ -255,33 +255,6 @@ class Utilities {
 
 
 	/**
-	 * Whether a taxonomy is attached only to WooCommerce products.
-	 * Shared taxonomies (e.g. post + product) return false.
-	 */
-	public static function is_product_related_taxonomy( $taxonomy_slug ) {
-		if ( ! is_string( $taxonomy_slug ) || '' === $taxonomy_slug ) {
-			return false;
-		}
-
-		$taxonomy = get_taxonomy( $taxonomy_slug );
-
-		if ( ! $taxonomy || empty( $taxonomy->object_type ) ) {
-			return false;
-		}
-
-		$product_object_types = [ 'product', 'product_variation' ];
-
-		foreach ( (array) $taxonomy->object_type as $object_type ) {
-			if ( ! in_array( $object_type, $product_object_types, true ) ) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-
-	/**
 	** Get All Users
 	*/
 	public static function get_users() {
@@ -968,27 +941,13 @@ class Utilities {
 	** Mailchimp AJAX Subscribe
 	*/
 	public static function ajax_mailchimp_subscribe() {
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+		// API Key
+        $api_key = !empty(get_option('wpr_mailchimp_api_key')) && false != get_option('wpr_mailchimp_api_key') ? get_option('wpr_mailchimp_api_key') : ''; // GOGA
 
-		if ( ! wp_verify_nonce( $nonce, 'wpr-addons-js' ) ) {
-			wp_send_json( [ 'status' => 'error' ] );
-		}
+        $api_key_sufix = explode( '-', $api_key )[1];
 
-		$document_id = isset( $_POST['document_id'] ) ? absint( wp_unslash( $_POST['document_id'] ) ) : 0;
-		$widget_id   = isset( $_POST['widget_id'] ) ? sanitize_text_field( wp_unslash( $_POST['widget_id'] ) ) : '';
-		$list_id     = isset( $_POST['listId'] ) ? sanitize_text_field( wp_unslash( $_POST['listId'] ) ) : '';
-
-		if ( ! self::wpr_verify_mailchimp_audience( $document_id, $widget_id, 'wpr-mailchimp', $list_id ) ) {
-			wp_send_json( [ 'status' => 'error' ] );
-		}
-
-		$api = self::wpr_mailchimp_api_parts();
-		if ( ! $api ) {
-			wp_send_json( [ 'status' => 'error' ] );
-		}
-
-		$api_key       = $api['key'];
-		$api_key_sufix = $api['dc'];
+        // List ID
+        $list_id = isset($_POST['listId']) ? sanitize_text_field(wp_unslash($_POST['listId'])) : '';
 
         // Get Available Fileds (PHPCS - fields are sanitized later on input)
 		$available_fields = isset($_POST['fields']) ? $_POST['fields'] : []; // phpcs:ignore
@@ -1001,13 +960,8 @@ class Utilities {
 			'PHONE' => !empty ( $fields['wpr_mailchimp_phone_number'] ) ? sanitize_text_field($fields['wpr_mailchimp_phone_number']) : '',
         );
 
-        $email = isset( $fields['wpr_mailchimp_email'] ) ? sanitize_email( $fields['wpr_mailchimp_email'] ) : '';
-        if ( ! is_email( $email ) ) {
-			wp_send_json( [ 'status' => 'error' ] );
-        }
-
         // API URL
-        $api_url = 'https://'. $api_key_sufix .'.api.mailchimp.com/3.0/lists/'. $list_id .'/members/'. md5( strtolower( $email ) );
+        $api_url = 'https://'. $api_key_sufix .'.api.mailchimp.com/3.0/lists/'. $list_id .'/members/'. md5(strtolower(sanitize_text_field($fields['wpr_mailchimp_email'])));
 
         // API Args
         $api_args = [
@@ -1017,7 +971,7 @@ class Utilities {
 				'Authorization' => 'apikey '. $api_key,
 			],
 			'body' => json_encode([
-				'email_address' => $email,
+				'email_address' => sanitize_text_field($fields[ 'wpr_mailchimp_email' ]),
 				'status' => 'subscribed',
 				'merge_fields' => $merge_fields,
 			]),
@@ -1030,14 +984,14 @@ class Utilities {
 			$request = json_decode( wp_remote_retrieve_body($request) );
 
 			// Set Status
-			if ( ! empty( $request ) && isset( $request->status ) && 'subscribed' === $request->status ) {
-				wp_send_json( [ 'status' => 'subscribed' ] );
+			if ( ! empty($request) ) {
+				if ($request->status == 'subscribed') {
+					wp_send_json([ 'status' => 'subscribed' ]);
+				} else {
+					wp_send_json([ 'status' => $request->title ]);
+				}
 			}
-
-			wp_send_json( [ 'status' => 'error' ] );
 		}
-
-		wp_send_json( [ 'status' => 'error' ] );
 	}
 
 	/**
@@ -1142,12 +1096,6 @@ class Utilities {
 		if ( '' === $api_key ) {
 			return $mailchimp_list;
 		} else {
-			$cache_key = 'wpr_mailchimp_lists_' . md5( $api_key );
-			$cached    = get_transient( $cache_key );
-			if ( is_array( $cached ) ) {
-				return $cached;
-			}
-
 	    	$url = 'https://'. substr( $api_key, strpos( $api_key, '-' ) + 1 ) .'.api.mailchimp.com/3.0/lists/';
 		    $args = [ 'headers' => [ 'Authorization' => 'Basic ' . base64_encode( 'user:'. $api_key ) ] ];
 
@@ -1161,8 +1109,6 @@ class Utilities {
 						$mailchimp_list[$list->id] = $list->name .' ('. $list->stats->member_count .')';
 					}
 				}
-
-				set_transient( $cache_key, $mailchimp_list, 10 * MINUTE_IN_SECONDS );
 			}
 
 			return $mailchimp_list;
@@ -1721,543 +1667,5 @@ class Utilities {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Elementor document that is currently rendering.
-	 *
-	 * @return int
-	 */
-	public static function wpr_get_current_document_id() {
-		$document_id = 0;
-
-		if ( class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->documents ) ) {
-			$document = \Elementor\Plugin::$instance->documents->get_current();
-			if ( $document && method_exists( $document, 'get_main_id' ) ) {
-				$document_id = (int) $document->get_main_id();
-			}
-		}
-
-		if ( $document_id < 1 ) {
-			$document_id = (int) get_the_ID();
-		}
-
-		return $document_id;
-	}
-
-	/**
-	 * Whether this request may write form settings for a document.
-	 *
-	 * Preview and draft renders must not persist. A published document may
-	 * refresh its own post meta. Editor saves require edit access to that post.
-	 *
-	 * @param int $document_id Elementor document ID.
-	 * @return bool
-	 */
-	public static function wpr_should_persist_form_settings( $document_id ) {
-		$document_id = absint( $document_id );
-		if ( $document_id < 1 ) {
-			return false;
-		}
-
-		if ( class_exists( '\Elementor\Plugin' ) ) {
-			$plugin = \Elementor\Plugin::$instance;
-
-			if ( isset( $plugin->preview ) && $plugin->preview->is_preview_mode() ) {
-				return false;
-			}
-
-			if ( isset( $plugin->editor ) && $plugin->editor->is_edit_mode() ) {
-				return current_user_can( 'edit_post', $document_id );
-			}
-		}
-
-		if ( is_preview() ) {
-			return false;
-		}
-
-		return 'publish' === get_post_status( $document_id );
-	}
-
-	/**
-	 * Store Form Builder mail settings on the owning document.
-	 *
-	 * Keys are post meta, not site-global options keyed only by element id.
-	 *
-	 * @param int   $document_id      Elementor document ID.
-	 * @param string $form_id         Elementor element ID.
-	 * @param array $instance         Widget settings.
-	 * @param bool  $include_referrer Whether to refresh the page URL/title.
-	 */
-	public static function wpr_save_form_settings( $document_id, $form_id, array $instance, $include_referrer = false ) {
-		$document_id = absint( $document_id );
-		$form_id     = preg_replace( '/[^A-Za-z0-9]/', '', (string) $form_id );
-
-		if ( $document_id < 1 || '' === $form_id ) {
-			return;
-		}
-
-		$meta_key = '_wpr_form_settings_' . $form_id;
-		$existing = get_post_meta( $document_id, $meta_key, true );
-		if ( ! is_array( $existing ) ) {
-			$existing = [];
-		}
-
-		$webhook           = isset( $instance['webhook_url'] ) ? $instance['webhook_url'] : '';
-		$validated_webhook = self::wpr_validate_webhook_url( $webhook );
-		if ( is_wp_error( $validated_webhook ) ) {
-			$validated_webhook = '';
-		}
-
-		$stored = [
-			'email_content_type' => ( isset( $instance['email_content_type'] ) && 'plain' === $instance['email_content_type'] ) ? 'plain' : 'html',
-			'email_to'           => isset( $instance['email_to'] ) ? sanitize_text_field( $instance['email_to'] ) : '',
-			'email_subject'      => isset( $instance['email_subject'] ) ? sanitize_text_field( $instance['email_subject'] ) : '',
-			'email_content'      => isset( $instance['email_content'] ) ? wp_kses_post( $instance['email_content'] ) : '',
-			'email_to_cc'        => isset( $instance['email_to_cc'] ) ? sanitize_text_field( $instance['email_to_cc'] ) : '',
-			'email_to_bcc'       => isset( $instance['email_to_bcc'] ) ? sanitize_text_field( $instance['email_to_bcc'] ) : '',
-			'email_from'         => isset( $instance['email_from'] ) ? sanitize_text_field( $instance['email_from'] ) : '',
-			'email_from_name'    => isset( $instance['email_from_name'] ) ? sanitize_text_field( $instance['email_from_name'] ) : '',
-			'email_reply_to'     => isset( $instance['email_reply_to'] ) ? sanitize_text_field( $instance['email_reply_to'] ) : '',
-			'webhook_url'        => $validated_webhook,
-			'referrer'           => isset( $existing['referrer'] ) ? esc_url_raw( $existing['referrer'] ) : '',
-			'referrer_title'     => isset( $existing['referrer_title'] ) ? sanitize_text_field( $existing['referrer_title'] ) : '',
-		];
-
-		// Only persist metadata when the widget actually has the control value.
-		// Elementor omits untouched defaults, and storing [] would drop Date/Time/Credit.
-		if ( isset( $instance['form_metadata'] ) && is_array( $instance['form_metadata'] ) ) {
-			$stored['form_metadata'] = array_map( 'sanitize_key', $instance['form_metadata'] );
-		} elseif ( isset( $existing['form_metadata'] ) && is_array( $existing['form_metadata'] ) ) {
-			$stored['form_metadata'] = $existing['form_metadata'];
-		}
-
-		if ( $include_referrer ) {
-			$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/'; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			$stored['referrer'] = esc_url_raw( home_url( $request_uri ) );
-			$title_id           = get_the_ID();
-			if ( $title_id ) {
-				$stored['referrer_title'] = sanitize_text_field( get_the_title( $title_id ) );
-			}
-		}
-
-		$stored['legacy_cleaned'] = true;
-
-		update_post_meta( $document_id, $meta_key, $stored );
-
-		if ( empty( $existing['legacy_cleaned'] ) ) {
-			self::wpr_delete_legacy_form_options( $form_id );
-		}
-	}
-
-	/**
-	 * Remove site-global form options keyed only by element id.
-	 *
-	 * @param string $form_id Elementor element ID.
-	 */
-	public static function wpr_delete_legacy_form_options( $form_id ) {
-		$form_id = preg_replace( '/[^A-Za-z0-9]/', '', (string) $form_id );
-		if ( '' === $form_id ) {
-			return;
-		}
-
-		$prefixes = [
-			'wpr_email_content_type_',
-			'wpr_email_to_',
-			'wpr_email_subject_',
-			'wpr_email_fields_',
-			'wpr_cc_header_',
-			'wpr_bcc_header_',
-			'wpr_email_from_',
-			'wpr_email_from_name_',
-			'wpr_reply_to_',
-			'wpr_meta_keys_',
-			'wpr_referrer_',
-			'wpr_referrer_title_',
-			'wpr_webhook_url_',
-		];
-
-		foreach ( $prefixes as $prefix ) {
-			delete_option( $prefix . $form_id );
-		}
-	}
-
-	/**
-	 * Load Elementor elements for a document.
-	 *
-	 * @param int $document_id Post ID.
-	 * @return array
-	 */
-	public static function wpr_get_elementor_elements( $document_id ) {
-		$document_id = absint( $document_id );
-		$elements    = [];
-
-		if ( $document_id < 1 ) {
-			return $elements;
-		}
-
-		if ( class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->documents ) ) {
-			$document = \Elementor\Plugin::$instance->documents->get( $document_id );
-			if ( $document ) {
-				$elements = $document->get_elements_data();
-			}
-		}
-
-		if ( empty( $elements ) || ! is_array( $elements ) ) {
-			$raw = get_post_meta( $document_id, '_elementor_data', true );
-
-			if ( is_string( $raw ) && '' !== $raw ) {
-				$decoded  = json_decode( $raw, true );
-				$elements = is_array( $decoded ) ? $decoded : [];
-			} elseif ( is_array( $raw ) ) {
-				$elements = $raw;
-			}
-		}
-
-		return is_array( $elements ) ? $elements : [];
-	}
-
-	/**
-	 * Find a published document containing a widget, for pages served from cache
-	 * before the document id was added to the markup.
-	 *
-	 * @param string $widget_id   Elementor element ID.
-	 * @param string $widget_type Expected widget type.
-	 * @return int Document ID, or 0.
-	 */
-	public static function wpr_find_widget_document( $widget_id, $widget_type ) {
-		global $wpdb;
-
-		$widget_id = preg_replace( '/[^A-Za-z0-9]/', '', (string) $widget_id );
-		if ( '' === $widget_id ) {
-			return 0;
-		}
-
-		$cache_key = 'wpr_widget_doc_' . md5( $widget_type . '|' . $widget_id );
-		$cached    = get_transient( $cache_key );
-		if ( false !== $cached ) {
-			$cached = absint( $cached );
-			if ( $cached && self::wpr_get_authorized_widget( $cached, $widget_id, $widget_type ) ) {
-				return $cached;
-			}
-		}
-
-		$like = '%' . $wpdb->esc_like( '"id":"' . $widget_id . '"' ) . '%';
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- result is cached in a transient.
-		$post_ids = $wpdb->get_col( $wpdb->prepare(
-			"SELECT pm.post_id FROM {$wpdb->postmeta} pm
-			INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-			WHERE pm.meta_key = '_elementor_data' AND p.post_status = 'publish' AND pm.meta_value LIKE %s
-			LIMIT 5",
-			$like
-		) );
-
-		$document_id = 0;
-		$matches     = 0;
-
-		foreach ( (array) $post_ids as $post_id ) {
-			if ( self::wpr_get_authorized_widget( $post_id, $widget_id, $widget_type ) ) {
-				$document_id = absint( $post_id );
-				$matches++;
-			}
-		}
-
-		// A duplicated element id is ambiguous; the owner check cannot pick safely.
-		if ( 1 !== $matches ) {
-			return 0;
-		}
-
-		set_transient( $cache_key, $document_id, DAY_IN_SECONDS );
-
-		return $document_id;
-	}
-
-	/**
-	 * Find a widget on a document the current visitor is allowed to use.
-	 *
-	 * Published documents are public. Unpublished documents require read access.
-	 *
-	 * @param int    $document_id Document post ID.
-	 * @param string $widget_id   Elementor element ID.
-	 * @param string $widget_type Expected widget type.
-	 * @return array|false
-	 */
-	public static function wpr_get_authorized_widget( $document_id, $widget_id, $widget_type ) {
-		$document_id = absint( $document_id );
-		$widget_id   = sanitize_text_field( (string) $widget_id );
-		$widget_type = sanitize_key( $widget_type );
-
-		if ( $document_id < 1 || '' === $widget_id || ! preg_match( '/^[A-Za-z0-9]+$/', $widget_id ) ) {
-			return false;
-		}
-
-		$post = get_post( $document_id );
-		if ( ! $post ) {
-			return false;
-		}
-
-		$status = get_post_status( $post );
-		if ( 'publish' !== $status ) {
-			// Drafts may send mail/webhooks only for users who could publish them anyway.
-			if ( ! current_user_can( 'edit_post', $document_id ) || ! current_user_can( 'publish_posts' ) ) {
-				return false;
-			}
-		}
-
-		$elements = self::wpr_get_elementor_elements( $document_id );
-		if ( empty( $elements ) ) {
-			return false;
-		}
-
-		$widget = self::find_widget_in_elements( $elements, $widget_id );
-		if ( ! is_array( $widget ) ) {
-			return false;
-		}
-
-		$found_type = isset( $widget['widgetType'] ) ? $widget['widgetType'] : '';
-
-		// Elementor Pro global widget: the page stores a reference, the settings live in the template.
-		if ( 'global' === $found_type && ! empty( $widget['templateID'] ) ) {
-			$template_id = absint( $widget['templateID'] );
-			if ( 'publish' !== get_post_status( $template_id ) ) {
-				return false;
-			}
-
-			$template_elements = self::wpr_get_elementor_elements( $template_id );
-			$global_widget     = isset( $template_elements[0] ) && is_array( $template_elements[0] ) ? $template_elements[0] : [];
-			$global_type       = isset( $global_widget['widgetType'] ) ? $global_widget['widgetType'] : '';
-
-			if ( $widget_type !== $global_type ) {
-				return false;
-			}
-
-			$global_widget['id'] = $widget_id;
-
-			return $global_widget;
-		}
-
-		if ( $widget_type !== $found_type ) {
-			return false;
-		}
-
-		return $widget;
-	}
-
-	/**
-	 * Widget settings with Elementor defaults and dynamic tags applied.
-	 *
-	 * Falls back to the raw saved settings if the widget cannot be instantiated.
-	 *
-	 * @param int   $document_id Document post ID.
-	 * @param array $widget      Elementor element data.
-	 * @return array
-	 */
-	public static function wpr_resolve_widget_display_settings( $document_id, array $widget ) {
-		$settings = ( isset( $widget['settings'] ) && is_array( $widget['settings'] ) ) ? $widget['settings'] : [];
-
-		if ( ! class_exists( '\Elementor\Plugin' ) || empty( \Elementor\Plugin::$instance->elements_manager ) ) {
-			return $settings;
-		}
-
-		if ( empty( $widget['elType'] ) ) {
-			$widget['elType'] = 'widget';
-		}
-
-		$documents = \Elementor\Plugin::$instance->documents;
-		$switched  = false;
-
-		if ( $documents && method_exists( $documents, 'switch_to_document' ) ) {
-			$document = $documents->get( absint( $document_id ) );
-			if ( $document ) {
-				$documents->switch_to_document( $document );
-				$switched = true;
-			}
-		}
-
-		$instance = \Elementor\Plugin::$instance->elements_manager->create_element_instance( $widget );
-		if ( $instance && method_exists( $instance, 'get_settings_for_display' ) ) {
-			$display = $instance->get_settings_for_display();
-			if ( is_array( $display ) && ! empty( $display ) ) {
-				$settings = $display;
-			}
-		}
-
-		if ( $switched && method_exists( $documents, 'restore_document' ) ) {
-			$documents->restore_document();
-		}
-
-		return $settings;
-	}
-
-	/**
-	 * Form mail settings for a widget that belongs to the given document.
-	 *
-	 * Prefers post meta written for that document. Falls back to the widget's
-	 * saved Elementor settings. Never reads site-global widget-id options.
-	 *
-	 * @param int    $document_id Document post ID.
-	 * @param string $form_id     Elementor element ID.
-	 * @return array|false
-	 */
-	public static function wpr_get_form_mail_settings( $document_id, $form_id ) {
-		if ( absint( $document_id ) < 1 ) {
-			$document_id = self::wpr_find_widget_document( $form_id, 'wpr-form-builder' );
-		}
-
-		$widget = self::wpr_get_authorized_widget( $document_id, $form_id, 'wpr-form-builder' );
-		if ( ! $widget ) {
-			return false;
-		}
-
-		$form_id  = preg_replace( '/[^A-Za-z0-9]/', '', (string) $form_id );
-		$stored   = get_post_meta( absint( $document_id ), '_wpr_form_settings_' . $form_id, true );
-		$settings = self::wpr_resolve_widget_display_settings( $document_id, $widget );
-
-		$webhook           = isset( $settings['webhook_url'] ) ? $settings['webhook_url'] : '';
-		$validated_webhook = self::wpr_validate_webhook_url( $webhook );
-		$baseline          = [
-			'email_content_type' => ( isset( $settings['email_content_type'] ) && 'plain' === $settings['email_content_type'] ) ? 'plain' : 'html',
-			'email_to'           => isset( $settings['email_to'] ) && '' !== $settings['email_to'] ? $settings['email_to'] : get_option( 'admin_email' ),
-			'email_subject'      => isset( $settings['email_subject'] ) ? $settings['email_subject'] : '',
-			'email_content'      => isset( $settings['email_content'] ) && '' !== $settings['email_content'] ? $settings['email_content'] : '[all-fields]',
-			'email_to_cc'        => isset( $settings['email_to_cc'] ) ? $settings['email_to_cc'] : '',
-			'email_to_bcc'       => isset( $settings['email_to_bcc'] ) ? $settings['email_to_bcc'] : '',
-			'email_from'         => isset( $settings['email_from'] ) ? $settings['email_from'] : '',
-			'email_from_name'    => isset( $settings['email_from_name'] ) ? $settings['email_from_name'] : '',
-			'email_reply_to'     => isset( $settings['email_reply_to'] ) ? $settings['email_reply_to'] : '',
-			'form_metadata'      => ( isset( $settings['form_metadata'] ) && is_array( $settings['form_metadata'] ) ) ? $settings['form_metadata'] : [ 'date', 'time', 'credit' ],
-			'referrer'           => '',
-			'referrer_title'     => '',
-			'webhook_url'        => is_wp_error( $validated_webhook ) ? '' : $validated_webhook,
-		];
-
-		if ( is_array( $stored ) ) {
-			$string_keys = [
-				'email_to',
-				'email_subject',
-				'email_content',
-				'email_to_cc',
-				'email_to_bcc',
-				'email_from',
-				'email_from_name',
-				'email_reply_to',
-				'referrer',
-				'referrer_title',
-				'webhook_url',
-			];
-
-			foreach ( $string_keys as $key ) {
-				if ( empty( $stored[ $key ] ) || ! is_string( $stored[ $key ] ) ) {
-					continue;
-				}
-
-				// Frontend render stores resolved values. Skip unresolved Elementor tags from an editor save.
-				if ( false !== strpos( $stored[ $key ], 'elementor-tag' ) ) {
-					continue;
-				}
-
-				$baseline[ $key ] = $stored[ $key ];
-			}
-
-			if ( isset( $stored['email_content_type'] ) && in_array( $stored['email_content_type'], [ 'html', 'plain' ], true ) ) {
-				$baseline['email_content_type'] = $stored['email_content_type'];
-			}
-
-			if ( isset( $stored['form_metadata'] ) && is_array( $stored['form_metadata'] ) && ! empty( $stored['form_metadata'] ) ) {
-				$baseline['form_metadata'] = $stored['form_metadata'];
-			}
-		}
-
-		if ( ! is_array( $baseline['form_metadata'] ) ) {
-			$baseline['form_metadata'] = [];
-		}
-
-		$baseline['email_content_type'] = ( 'plain' === $baseline['email_content_type'] ) ? 'plain' : 'html';
-
-		return $baseline;
-	}
-
-	/**
-	 * Advanced-filter keys taken from the request.
-	 *
-	 * Rejects private (underscore-prefixed) meta keys. `_price` stays allowed
-	 * because the product grid maps that alias to a fixed numeric price range.
-	 *
-	 * @param string $key Filter key with the wpr_af_ prefix already removed.
-	 * @return bool
-	 */
-	public static function wpr_is_allowed_filter_key( $key ) {
-		$key = sanitize_text_field( (string) $key );
-
-		if ( '' === $key ) {
-			return false;
-		}
-
-		if ( '_price' === $key ) {
-			return true;
-		}
-
-		if ( '_' === $key[0] ) {
-			return false;
-		}
-
-		return (bool) preg_match( '/^[A-Za-z0-9_\-]+$/', $key );
-	}
-
-	/**
-	 * Confirm a Mailchimp list id belongs to a published widget before the API key is used.
-	 *
-	 * @param int    $document_id Document post ID.
-	 * @param string $widget_id   Elementor element ID.
-	 * @param string $widget_type Expected widget type.
-	 * @param string $list_id     Caller-supplied audience id.
-	 * @return bool
-	 */
-	public static function wpr_verify_mailchimp_audience( $document_id, $widget_id, $widget_type, $list_id ) {
-		$list_id = sanitize_text_field( (string) $list_id );
-
-		if ( '' === $list_id || 'def' === $list_id || ! preg_match( '/^[A-Za-z0-9]+$/', $list_id ) ) {
-			return false;
-		}
-
-		if ( absint( $document_id ) < 1 ) {
-			$document_id = self::wpr_find_widget_document( $widget_id, $widget_type );
-		}
-
-		$widget = self::wpr_get_authorized_widget( $document_id, $widget_id, $widget_type );
-		if ( ! $widget ) {
-			return false;
-		}
-
-		$settings   = ( isset( $widget['settings'] ) && is_array( $widget['settings'] ) ) ? $widget['settings'] : [];
-		$configured = isset( $settings['maichimp_audience'] ) ? sanitize_text_field( (string) $settings['maichimp_audience'] ) : '';
-
-		if ( '' === $configured || 'def' === $configured || strlen( $configured ) !== strlen( $list_id ) ) {
-			return false;
-		}
-
-		return hash_equals( $configured, $list_id );
-	}
-
-	/**
-	 * Parsed Mailchimp API key, or false when the stored key is missing or malformed.
-	 *
-	 * @return array{key: string, dc: string}|false
-	 */
-	public static function wpr_mailchimp_api_parts() {
-		$api_key = get_option( 'wpr_mailchimp_api_key', '' );
-		$api_key = is_string( $api_key ) ? trim( $api_key ) : '';
-
-		if ( ! preg_match( '/^[0-9a-f]{32}-[a-z]{2}[0-9]{1,2}$/i', $api_key ) ) {
-			return false;
-		}
-
-		$parts = explode( '-', $api_key, 2 );
-
-		return [
-			'key' => $api_key,
-			'dc'  => $parts[1],
-		];
 	}
 }

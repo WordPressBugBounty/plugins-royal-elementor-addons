@@ -66,55 +66,6 @@ class Wpr_Product_Tabs extends Widget_Base {
 	protected function register_controls() {
 
 		$this->start_controls_section(
-			'section_product_tab_titles',
-			[
-				'label' => esc_html__( 'Tab Titles', 'wpr-addons' ),
-			]
-		);
-
-		$this->add_control(
-			'tab_title_description',
-			[
-				'label' => esc_html__( 'Description', 'wpr-addons' ),
-				'type' => Controls_Manager::TEXT,
-				'label_block' => true,
-				'placeholder' => esc_html__( 'Description', 'wpr-addons' ),
-				'dynamic' => [
-					'active' => true,
-				],
-			]
-		);
-
-		$this->add_control(
-			'tab_title_additional_information',
-			[
-				'label' => esc_html__( 'Additional Information', 'wpr-addons' ),
-				'type' => Controls_Manager::TEXT,
-				'label_block' => true,
-				'placeholder' => esc_html__( 'Additional information', 'wpr-addons' ),
-				'dynamic' => [
-					'active' => true,
-				],
-			]
-		);
-
-		$this->add_control(
-			'tab_title_reviews',
-			[
-				'label' => esc_html__( 'Reviews', 'wpr-addons' ),
-				'type' => Controls_Manager::TEXT,
-				'label_block' => true,
-				'placeholder' => esc_html__( 'Reviews ({count})', 'wpr-addons' ),
-				'description' => esc_html__( 'Use {count} to show the number of reviews.', 'wpr-addons' ),
-				'dynamic' => [
-					'active' => true,
-				],
-			]
-		);
-
-		$this->end_controls_section();
-
-		$this->start_controls_section(
 			'section_product_tabs_style',
 			[
 				'label' => esc_html__( 'Tab Labels', 'wpr-addons' ),
@@ -2206,38 +2157,6 @@ class Wpr_Product_Tabs extends Widget_Base {
 		return $htm . $reviews_title;
 	}
 
-	public function filter_product_tab_titles( $tabs ) {
-		$settings = $this->get_settings_for_display();
-
-		if ( ! is_array( $tabs ) ) {
-			return $tabs;
-		}
-
-		$description_title = isset( $settings['tab_title_description'] ) ? trim( $settings['tab_title_description'] ) : '';
-		if ( '' !== $description_title && isset( $tabs['description'] ) ) {
-			$tabs['description']['title'] = $description_title;
-		}
-
-		$additional_title = isset( $settings['tab_title_additional_information'] ) ? trim( $settings['tab_title_additional_information'] ) : '';
-		if ( '' !== $additional_title && isset( $tabs['additional_information'] ) ) {
-			$tabs['additional_information']['title'] = $additional_title;
-		}
-
-		$reviews_title = isset( $settings['tab_title_reviews'] ) ? trim( $settings['tab_title_reviews'] ) : '';
-		if ( '' !== $reviews_title && isset( $tabs['reviews'] ) ) {
-			$count = 0;
-			$product = wc_get_product();
-
-			if ( $product ) {
-				$count = (int) $product->get_review_count();
-			}
-
-			$tabs['reviews']['title'] = str_replace( '{count}', (string) $count, $reviews_title );
-		}
-
-		return $tabs;
-	}
-
     protected function render() {
 		$is_editor = \Elementor\Plugin::$instance->editor->is_edit_mode();
 
@@ -2257,17 +2176,13 @@ class Wpr_Product_Tabs extends Widget_Base {
 
         setup_postdata( $product->get_id() );
 
-		add_filter( 'woocommerce_reviews_title', [ $this, 'change_html' ], 99, 3 );
-		add_filter( 'woocommerce_product_tabs', [ $this, 'filter_product_tab_titles' ], 99 );
+		add_filter('woocommerce_reviews_title', [$this, 'change_html'], 99, 3);
 
 		echo '<div class="wpr-product-tabs">';
 
         wc_get_template( 'single-product/tabs/tabs.php' );
-
+		
 		echo '</div>';
-
-		remove_filter( 'woocommerce_product_tabs', [ $this, 'filter_product_tab_titles' ], 99 );
-		remove_filter( 'woocommerce_reviews_title', [ $this, 'change_html' ], 99 );
 
 
 		// Logged-in user back.

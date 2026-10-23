@@ -440,13 +440,6 @@ class Wpr_Woo_Grid extends Widget_Base {
 		];
 	}
 
-	public function add_repeater_args_element_addcart_quantity() {
-		return [
-			'type' => Controls_Manager::HIDDEN,
-			'default' => ''
-		];
-	}
-
 	public function add_repeater_args_element_show_added_tc_popup() {
 		return [
 			'type' => Controls_Manager::HIDDEN,
@@ -623,8 +616,6 @@ class Wpr_Woo_Grid extends Widget_Base {
 	public function add_control_add_to_cart_animation() {}
 	
 	public function add_control_add_to_cart_animation_height() {}
-
-	public function add_control_add_to_cart_quantity_styles() {}
 	
 	public function add_control_filters_pointer_color_hr() {}
 	
@@ -2009,8 +2000,6 @@ class Wpr_Woo_Grid extends Widget_Base {
 				]
 			]
 		);
-
-		$repeater->add_control( 'element_addcart_quantity', $this->add_repeater_args_element_addcart_quantity() );
 
 		$repeater->add_control( 'element_show_added_tc_popup', $this->add_repeater_args_element_show_added_tc_popup() );
 
@@ -3535,7 +3524,6 @@ class Wpr_Woo_Grid extends Widget_Base {
 			'Grid Item Even/Odd Background Color',
 			'Title, Category, Read More Advanced Link Hover Animation',
 			'Open Links in New Tab',
-			'Add to Cart Quantity Buttons',
 			'Custom Fields/Attributes Support (Expert)',
 			'Wishlist & Compare Buttons (Expert)'
 		] );
@@ -4937,7 +4925,7 @@ class Wpr_Woo_Grid extends Widget_Base {
 			]
 		);
 
-		$this->add_responsive_control(
+		$this->add_control(
 			'product_rating_size',
 			[
 				'label' => esc_html__( 'Size', 'wpr-addons' ),
@@ -6222,8 +6210,6 @@ class Wpr_Woo_Grid extends Widget_Base {
 				'separator' => 'before',
 			]
 		);
-
-		$this->add_control_add_to_cart_quantity_styles();
 
 		$this->end_controls_section();
 

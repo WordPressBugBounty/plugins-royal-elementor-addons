@@ -926,13 +926,7 @@ class Advanced_Text extends Widget_Base {
 			<?php
 
 			if ( '' !== $settings['text_link']['url'] ) {
-				$link_url = apply_filters( 'wpml_permalink', $settings['text_link']['url'] );
-
-				if ( function_exists( 'pll_translate_url' ) ) {
-					$link_url = pll_translate_url( $link_url );
-				}
-
-				$this->add_render_attribute( 'text_link', 'href', esc_url( $link_url ) );
+				$this->add_render_attribute( 'text_link', 'href', esc_url( $settings['text_link']['url'] ) );
 
 				if ( $settings['text_link']['is_external'] ) {
 					$this->add_render_attribute( 'text_link', 'target', '_blank' );

@@ -71,9 +71,6 @@ class WPR_Render_Templates {
 			require_once __DIR__ . '/../templates/views/hfe/class-hfe-compat.php';
 		}
 
-		// ElementsKit header/footer. Loaded on wp so it still runs if ElementsKit loads after REA.
-		add_action( 'wp', [ $this, 'load_elementskit_compat' ], 1 );
-
 		// Scripts and Styles
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 
@@ -82,17 +79,6 @@ class WPR_Render_Templates {
 			add_filter( 'template_include', [ $this, 'convert_to_canvas' ], 12 ); // 12 after WP Pages and WooCommerce.
 			add_action( 'elementor/page_templates/canvas/wpr_print_content', [ $this, 'canvas_page_content_display' ] );
 		}
-	}
-
-	/**
-	 * Load ElementsKit canvas compatibility once its header/footer module is available.
-	 */
-	public function load_elementskit_compat() {
-		if ( ! class_exists( '\ElementsKit_Lite\Modules\Header_Footer\Activator' ) ) {
-			return;
-		}
-
-		require_once __DIR__ . '/../templates/views/elementskit/class-elementskit-compat.php';
 	}
 
 	public function global_compatibility() {

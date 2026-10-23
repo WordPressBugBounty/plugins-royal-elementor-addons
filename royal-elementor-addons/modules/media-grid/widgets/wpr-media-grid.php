@@ -6778,10 +6778,6 @@ class Wpr_Media_Grid extends Widget_Base {
 
 		$display_settings = $this->get_settings_for_display();
 
-		$document = \Elementor\Plugin::$instance->documents->get_current();
-		$document_id = $document ? $document->get_main_id() : get_the_ID();
-		$widget_id = $this->get_id();
-
 		//:TODO
 		$layout_settings = [
 			'layout' => $settings['layout_select'],
@@ -6813,9 +6809,6 @@ class Wpr_Media_Grid extends Widget_Base {
 			'filters_animation_delay' => $settings['filters_animation_delay'],
 			'pagination_type' => $settings['pagination_type'],
 			'pagination_max_pages' => WPR_Media_Grid_Helpers::get_max_num_pages( $display_settings ),
-			'wpr_widget_id' => $widget_id,
-			'wpr_document_id' => $document_id,
-			'wpr_media_nonce' => wp_create_nonce( 'wpr_media_grid_' . $widget_id ),
 		];
 
 		if ( !defined('WPR_ADDONS_PRO_VERSION') || !wpr_fs()->can_use_premium_code() ) {

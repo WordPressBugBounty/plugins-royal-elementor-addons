@@ -51,24 +51,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 			}
 		}
 		
-		$document_id   = isset( $_POST['wpr_form_document_id'] ) ? absint( wp_unslash( $_POST['wpr_form_document_id'] ) ) : 0;
-		$form_id       = isset( $_POST['wpr_form_id'] ) ? sanitize_text_field( wp_unslash( $_POST['wpr_form_id'] ) ) : '';
-		$form_settings = Utilities::wpr_get_form_mail_settings( $document_id, $form_id );
-
-		if ( ! is_array( $form_settings ) ) {
-			wp_send_json_error( [
-				'action'  => 'wpr_form_builder_email',
-				'message' => esc_html__( 'Invalid form.', 'wpr-addons' ),
-				'status'  => 'error',
-			] );
-		}
-
-		$content_type = $form_settings['email_content_type'];
+		$form_id      = isset( $_POST['wpr_form_id'] ) ? sanitize_text_field( wp_unslash( $_POST['wpr_form_id'] ) ) : '';
+		$content_type = get_option( 'wpr_email_content_type_' . $form_id );
 		$is_html      = ( 'html' === $content_type );
 
 		$line_break = $is_html ? '<br>' : "\n";
     
-		$email_fields = trim( (string) $form_settings['email_content'] );
+		$email_fields = trim( (string) get_option( 'wpr_email_fields_' . $form_id ) );
 
 		$replace_shortcode_with_value = function ( $matches ) use ( $form_content, $is_html ) {
 			$field_id = $matches[1];
@@ -132,7 +121,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			);
 		}
 		
-		$meta_keys = $form_settings['form_metadata'];
+		$meta_keys = get_option( 'wpr_meta_keys_' . $form_id );
 		$meta_fields = [];
 
 		if ( is_array( $meta_keys ) ) {
@@ -153,7 +142,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						break;
 
 					case 'page_url':
-						$referrer_url = isset( $form_settings['referrer'] ) ? $form_settings['referrer'] : '';
+						$referrer_url = get_option( 'wpr_referrer_' . $form_id ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 						$meta_fields['page_url'] = [
 							'title' => __( 'Page URL', 'wpr-addons' ),
 							'value' => $referrer_url ? esc_url( $referrer_url ) : '',
@@ -161,7 +150,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						break;
 
 					case 'page_title':
-						$referrer_title = isset( $form_settings['referrer_title'] ) ? $form_settings['referrer_title'] : '';
+						$referrer_title = get_option( 'wpr_referrer_title_' . $form_id ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 						$meta_fields['page_title'] = [
 							'title' => __( 'Page Title', 'wpr-addons' ),
 							'value' => $referrer_title ? sanitize_text_field( $referrer_title ) : '',
@@ -198,24 +187,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$email_meta[] = $this->format_body_field_line( $value['title'], $value['value'], $is_html );
 		}
 
-        $to = $this->apply_email_address_list( $form_settings['email_to'], $form_content );
+        $to = get_option( 'wpr_email_to_' . $form_id );
 
-		if ( is_wp_error( $to ) ) {
-			wp_send_json_error( [
-				'action'  => 'wpr_form_builder_email',
-				'message' => esc_html__( 'A notification recipient is invalid.', 'wpr-addons' ),
-				'status'  => 'error',
-			] );
-		}
-
-        $subject = preg_replace_callback(
+		$to = preg_replace_callback(
 			'/\[id="(\w+)"\]/',
 			function ( $matches ) use ( $form_content ) {
 				return $this->get_field_value( $matches[1], $form_content );
 			},
-			(string) $form_settings['email_subject']
+			$to
 		);
-		$subject = str_replace( [ "\r", "\n" ], '', (string) $subject );
+
+        $subject = get_option( 'wpr_email_subject_' . $form_id );
+
+		$subject = preg_replace_callback(
+			'/\[id="(\w+)"\]/',
+			function ( $matches ) use ( $form_content ) {
+				return $this->get_field_value( $matches[1], $form_content );
+			},
+			$subject
+		);
 
 		if ( $processed_message ) {
 			$message_body[] = $processed_message;
@@ -233,60 +223,84 @@ if ( ! defined( 'ABSPATH' ) ) {
         $body = implode($line_break, $message_body) . $line_break . '-----' . $line_break . implode($line_break, $email_meta);
 
 		$cc_header = '';
-		if ( ! empty( $form_settings['email_to_cc'] ) ) {
-			$cc_addresses = $this->apply_email_address_list( $form_settings['email_to_cc'], $form_content, true );
+		if ( ! empty( get_option( 'wpr_cc_header_' . $form_id ) ) ) {
+			$cc_header = 'Cc: ' . get_option( 'wpr_cc_header_' . $form_id );
 
-			if ( is_wp_error( $cc_addresses ) ) {
-				wp_send_json_error( [
-					'action'  => 'wpr_form_builder_email',
-					'message' => esc_html__( 'A notification recipient is invalid.', 'wpr-addons' ),
-					'status'  => 'error',
-				] );
-			}
-
-			if ( '' !== $cc_addresses ) {
-				$cc_header = 'Cc: ' . $cc_addresses;
-			}
+			$cc_header = preg_replace_callback(
+				'/\[id="(\w+)"\]/',
+				function ( $matches ) use ( $form_content ) {
+					return $this->get_field_value( $matches[1], $form_content );
+				},
+				$cc_header
+			);
 		}
 
 		$bcc_header = '';
-		if ( ! empty( $form_settings['email_to_bcc'] ) ) {
-			$bcc_addresses = $this->apply_email_address_list( $form_settings['email_to_bcc'], $form_content, true );
+		if ( ! empty( get_option( 'wpr_bcc_header_' . $form_id ) ) ) {
+			$bcc_header = 'Bcc: ' . get_option( 'wpr_bcc_header_' . $form_id );
 
-			if ( is_wp_error( $bcc_addresses ) ) {
-				wp_send_json_error( [
-					'action'  => 'wpr_form_builder_email',
-					'message' => esc_html__( 'A notification recipient is invalid.', 'wpr-addons' ),
-					'status'  => 'error',
-				] );
-			}
-
-			if ( '' !== $bcc_addresses ) {
-				$bcc_header = 'Bcc: ' . $bcc_addresses;
-			}
+			$bcc_header = preg_replace_callback(
+				'/\[id="(\w+)"\]/',
+				function ( $matches ) use ( $form_content ) {
+					return $this->get_field_value( $matches[1], $form_content );
+				},
+				$bcc_header
+			);
 		}
 		
-		$email_from = '';
-		$reply_to   = '';
+		$email_from_name = '';
+		$email_from_mail = '';
+		$reply_to        = '';
 
-		if ( ! empty( $form_settings['email_reply_to'] ) || ! empty( $form_settings['email_from'] ) ) {
-			$reply_to_address = $this->apply_single_email_address( $form_settings['email_reply_to'], $form_content );
-			$email_from_name  = $this->apply_from_name( $form_settings['email_from_name'], $form_content );
-			$email_from_mail  = $this->apply_single_email_address( $form_settings['email_from'], $form_content );
+		if ( ! empty( get_option( 'wpr_reply_to_' . $form_id ) ) && ! empty( get_option( 'wpr_email_from_name_' . $form_id ) ) && ! empty( get_option( 'wpr_email_from_' . $form_id ) ) ) {
+			
+			preg_match_all( '/id="([^"]+)"/', get_option( 'wpr_reply_to_' . $form_id ), $matche );
+			$reply_to_field_id = $matche[1];
+			
+			preg_match_all( '/id="([^"]+)"/', get_option( 'wpr_email_from_name_' . $form_id ), $matche );
+			$email_from_name_field_id = $matche[1];
+			
+			preg_match_all( '/id="([^"]+)"/', get_option( 'wpr_email_from_' . $form_id ), $matche );
+			$email_from_field_id = $matche[1];
 
-			// A bad Reply-To or From is dropped. Delivery to the validated To address still proceeds.
-			if ( ! is_wp_error( $reply_to_address ) && '' !== $reply_to_address ) {
-				$reply_to = 'Reply-To: ' . $reply_to_address;
+			foreach ( $form_content as $key => $value ) {
+				if ( ! is_array( $value ) ) {
+					continue;
+				}
+				$key_parts = explode( '-', (string) $key );
+				$last_part = end( $key_parts );
+
+				if ( in_array( $last_part, $reply_to_field_id, true ) ) {
+					$reply_to_address = $this->get_field_value( $last_part, $form_content );
+				}
+
+				if ( in_array( $last_part, $email_from_name_field_id, true ) ) {
+					$email_from_name = $this->get_field_value( $last_part, $form_content );
+				}
+
+				if ( in_array( $last_part, $email_from_field_id, true ) ) {
+					$email_from_mail = $this->get_field_value( $last_part, $form_content );
+				}
 			}
 
-			if ( ! is_wp_error( $email_from_mail ) && '' !== $email_from_mail ) {
-				$email_from = '' !== $email_from_name
-					? sprintf( 'From: %s <%s>', $email_from_name, $email_from_mail )
-					: 'From: ' . $email_from_mail;
+			if ( ! isset( $reply_to_address ) || empty( $reply_to_address ) ) {
+				$reply_to_address = get_option( 'wpr_reply_to_' . $form_id );
 			}
+
+			if ( ! isset( $email_from_name ) || empty( $email_from_name ) ) {
+				$email_from_name = get_option( 'wpr_email_from_name_' . $form_id );
+			}
+
+			if ( ! isset( $email_from_mail ) || empty( $email_from_mail ) ) {
+				$email_from_mail = get_option( 'wpr_email_from_' . $form_id );
+			}
+			
+			$reply_to = 'Reply-To: ' . $reply_to_address;
 		}
 		
-		$headers = array_filter( [ 'Content-Type: text/'. $content_type .'; charset=UTF-8', $email_from, $cc_header, $bcc_header, $reply_to ] );
+		$email_from = sprintf( 'From: %s <%s>' . "\r\n", $email_from_name, $email_from_mail );
+		
+		$headers = array('Content-Type: text/'. $content_type .'; charset=UTF-8', $email_from, $cc_header, $bcc_header, $reply_to);
       
         // Send email using wp_mail() function
         $sent = wp_mail( $to, $subject, $body, $headers);
@@ -424,134 +438,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		}
 
 		return '';
-	}
-
-	/**
-	 * Substitute [id="..."] shortcodes in a recipient template.
-	 *
-	 * Each substituted value must be one email address. Commas and extra
-	 * addresses in the submitted value are removed, leaving any static addresses.
-	 *
-	 * @param string $template     Stored recipient template.
-	 * @param array  $form_content Submitted fields.
-	 * @return string
-	 */
-	protected function replace_email_shortcodes( $template, $form_content ) {
-		$result = preg_replace_callback(
-			'/\[id="(\w+)"\]/',
-			function ( $matches ) use ( $form_content ) {
-				$value = trim( $this->get_field_value( $matches[1], $form_content ) );
-				if ( ! $this->is_single_email_address( $value ) ) {
-					return '';
-				}
-				return sanitize_email( $value );
-			},
-			(string) $template
-		);
-
-		return is_string( $result ) ? $result : '';
-	}
-
-	/**
-	 * Resolve a To, Cc, or Bcc template into a comma-separated address list.
-	 *
-	 * Static admin addresses may be comma-separated. A value inserted from a
-	 * submitted field must already be a single address.
-	 *
-	 * @param string $template     Stored recipient template.
-	 * @param array  $form_content Submitted fields.
-	 * @param bool   $allow_empty  Whether an empty result is valid.
-	 * @return string|\WP_Error
-	 */
-	protected function apply_email_address_list( $template, $form_content, $allow_empty = false ) {
-		$replaced = trim( str_replace( [ "\r", "\n" ], '', $this->replace_email_shortcodes( $template, $form_content ) ) );
-		if ( '' === $replaced ) {
-			if ( $allow_empty ) {
-				return '';
-			}
-			return new \WP_Error( 'wpr_invalid_recipient', esc_html__( 'A notification recipient is invalid.', 'wpr-addons' ) );
-		}
-
-		$parts = preg_split( '/\s*,\s*/', $replaced );
-		$clean = [];
-
-		if ( is_array( $parts ) ) {
-			foreach ( $parts as $part ) {
-				$part = trim( $part );
-
-				// Static "Name <address>" entries configured by the admin.
-				if ( preg_match( '/<([^<>\s,;]+)>$/', $part, $named ) ) {
-					$part = $named[1];
-				}
-
-				if ( '' === $part || ! $this->is_single_email_address( $part ) ) {
-					continue;
-				}
-				$clean[] = sanitize_email( $part );
-			}
-		}
-
-		if ( empty( $clean ) ) {
-			if ( $allow_empty ) {
-				return '';
-			}
-			return new \WP_Error( 'wpr_invalid_recipient', esc_html__( 'A notification recipient is invalid.', 'wpr-addons' ) );
-		}
-
-		return implode( ', ', $clean );
-	}
-
-	/**
-	 * Resolve a single-address header (From or Reply-To).
-	 *
-	 * @param string $template     Stored address template.
-	 * @param array  $form_content Submitted fields.
-	 * @return string|\WP_Error
-	 */
-	protected function apply_single_email_address( $template, $form_content ) {
-		$replaced = trim( str_replace( [ "\r", "\n" ], '', $this->replace_email_shortcodes( $template, $form_content ) ) );
-		if ( ! $this->is_single_email_address( $replaced ) ) {
-			return new \WP_Error( 'wpr_invalid_recipient', esc_html__( 'A notification recipient is invalid.', 'wpr-addons' ) );
-		}
-
-		return sanitize_email( $replaced );
-	}
-
-	/**
-	 * Resolve the From name and strip header-breaking characters.
-	 *
-	 * @param string $template     Stored from-name template.
-	 * @param array  $form_content Submitted fields.
-	 * @return string
-	 */
-	protected function apply_from_name( $template, $form_content ) {
-		$result = preg_replace_callback(
-			'/\[id="(\w+)"\]/',
-			function ( $matches ) use ( $form_content ) {
-				return $this->get_field_value( $matches[1], $form_content );
-			},
-			(string) $template
-		);
-
-		$result = str_replace( [ "\r", "\n", '<', '>' ], '', (string) $result );
-
-		return trim( sanitize_text_field( $result ) );
-	}
-
-	/**
-	 * Whether a string is exactly one email address.
-	 *
-	 * @param string $value Candidate address.
-	 * @return bool
-	 */
-	protected function is_single_email_address( $value ) {
-		$value = trim( (string) $value );
-
-		if ( '' === $value || preg_match( '/[\s,;<>]/', $value ) ) {
-			return false;
-		}
-
-		return (bool) is_email( $value );
 	}
  }
 

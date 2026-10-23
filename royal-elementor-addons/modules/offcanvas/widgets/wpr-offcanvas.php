@@ -1114,7 +1114,7 @@ class Wpr_Offcanvas extends Widget_Base {
 		$this->add_responsive_control(
 			'offcanvas_wrap_margin',
 			[
-				'label' => esc_html__( 'Wrapper Margin', 'wpr-addons' ),
+				'label' => esc_html__( 'Margin', 'wpr-addons' ),
 				'type' => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%' ],
 				'default' => [

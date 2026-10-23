@@ -1107,88 +1107,7 @@ class Wpr_Nav_Menu extends Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .wpr-nav-menu-horizontal .wpr-nav-menu > li > .wpr-sub-menu' => 'margin-top: {{SIZE}}{{UNIT}};',
 				],
-			]
-		);
-
-		$this->add_control(
-			'sub_menu_align',
-			[
-				'label' => esc_html__( 'Align', 'wpr-addons' ),
-				'type' => Controls_Manager::CHOOSE,
-				'label_block' => false,
-				'options' => [
-					'left' => [
-						'title' => esc_html__( 'Left', 'wpr-addons' ),
-						'icon' => 'eicon-h-align-left',
-					],
-					'right' => [
-						'title' => esc_html__( 'Right', 'wpr-addons' ),
-						'icon' => 'eicon-h-align-right',
-					],
-				],
-				'selectors_dictionary' => [
-					'left' => 'left: 0; right: auto;',
-					'right' => 'right: 0; left: auto;',
-				],
-				'selectors' => [
-					'{{WRAPPER}} .wpr-nav-menu-horizontal .wpr-nav-menu > li > .wpr-sub-menu' => '{{VALUE}}',
-				],
-				'condition' => [
-					'menu_layout' => 'horizontal',
-				],
-				'separator' => 'before',
-			]
-		);
-
-		$this->add_responsive_control(
-			'sub_menu_offset_hr',
-			[
-				'label' => esc_html__( 'Horizontal Offset (Left)', 'wpr-addons' ),
-				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'px', '%' ],
-				'range' => [
-					'px' => [
-						'min' => -50,
-						'max' => 50,
-					],
-					'%' => [
-						'min' => -100,
-						'max' => 100,
-					],
-				],
-				'selectors' => [
-					'{{WRAPPER}} .wpr-nav-menu-horizontal .wpr-nav-menu > li > .wpr-sub-menu' => 'left: {{SIZE}}{{UNIT}};',
-				],
-				'condition' => [
-					'menu_layout' => 'horizontal',
-					'sub_menu_align' => 'left',
-				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'sub_menu_offset_hr_right',
-			[
-				'label' => esc_html__( 'Horizontal Offset (Right)', 'wpr-addons' ),
-				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'px', '%' ],
-				'range' => [
-					'px' => [
-						'min' => -50,
-						'max' => 50,
-					],
-					'%' => [
-						'min' => -100,
-						'max' => 100,
-					],
-				],
-				'selectors' => [
-					'{{WRAPPER}} .wpr-nav-menu-horizontal .wpr-nav-menu > li > .wpr-sub-menu' => 'right: {{SIZE}}{{UNIT}};',
-				],
-				'condition' => [
-					'menu_layout' => 'horizontal',
-					'sub_menu_align' => 'right',
-				],
+				'separator' => 'after',
 			]
 		);
 
@@ -1199,8 +1118,7 @@ class Wpr_Nav_Menu extends Widget_Base {
 				'type' => Controls_Manager::SWITCHER,
 				'prefix_class' => 'wpr-sub-divider-',
 				'default' => 'yes',
-				'return_value' => 'yes',
-				'separator' => 'before',
+				'return_value' => 'yes'
 			]
 		);
 
