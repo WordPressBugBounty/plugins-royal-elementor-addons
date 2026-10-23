@@ -40,6 +40,7 @@
                 <field name="Advanced Text: Highlight Text" editor_type="LINE">highlighted_text</field>
                 <field name="Advanced Text: Suffix Text" editor_type="LINE">suffix_text</field>
                 <field name="Advanced Text: Clipped Text" editor_type="LINE">clipped_text</field>
+                <field name="Advanced Text: Link" editor_type="LINE" key_of="text_link">url</field>
             </fields>
         </widget>
 

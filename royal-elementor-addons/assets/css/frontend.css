@@ -21382,3 +21382,152 @@ a.wpr-google-place-summary-rating:hover {
         right: 8px;
     }
 }
+
+/* Woo Grid Quantity */
+.wpr-grid-item-add-to-cart .inner-block.wpr-grid-atc-has-qty {
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -webkit-box-align: stretch;
+        -ms-flex-align: stretch;
+            align-items: stretch;
+    vertical-align: middle;
+    gap: 8px;
+    max-width: 100%;
+}
+
+.wpr-grid-item-display-custom.wpr-grid-item-add-to-cart .inner-block.wpr-grid-atc-has-qty {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    width: 100%;
+}
+
+.wpr-grid-item-display-custom.wpr-grid-item-add-to-cart .inner-block.wpr-grid-atc-has-qty > a {
+    -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+}
+
+.wpr-grid-qty {
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
+    -ms-flex-wrap: nowrap;
+        flex-wrap: nowrap;
+    -webkit-box-align: stretch;
+        -ms-flex-align: stretch;
+            align-items: stretch;
+    -ms-flex-item-align: stretch;
+        align-self: stretch;
+    -ms-flex-negative: 0;
+        flex-shrink: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+    border: 2px solid #E8E8E8;
+    border-radius: 2px;
+    background-color: #fff;
+    color: #333;
+}
+
+.wpr-grid-qty-btn,
+.wpr-grid-qty-input {
+    box-sizing: border-box;
+    height: 100%;
+    min-height: 0;
+}
+
+.wpr-grid-qty-btn {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -ms-flex-preferred-size: 28px;
+        flex-basis: 28px;
+    -ms-flex-negative: 0;
+        flex-shrink: 0;
+    width: 28px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1;
+    cursor: pointer;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+    -webkit-transition: color 0.15s ease, background-color 0.15s ease;
+    -o-transition: color 0.15s ease, background-color 0.15s ease;
+    transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.wpr-grid-qty-btn.wpr-grid-qty-disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
+
+.wpr-grid-qty-btn:focus-visible,
+.wpr-grid-qty-input:focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: -1px;
+    z-index: 1;
+}
+
+.elementor-widget-wpr-woo-grid .wpr-grid-qty-input,
+.woocommerce .elementor-widget-wpr-woo-grid input.wpr-grid-qty-input,
+.woocommerce input.wpr-grid-qty-input[type="text"] {
+    -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+    width: 3em;
+    min-width: 2.5em;
+    max-width: 6em;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 0 8px !important;
+    margin: 0 !important;
+    border: none !important;
+    border-left: 1px solid #E8E8E8 !important;
+    border-right: 1px solid #E8E8E8 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    color: inherit;
+    font-size: 14px;
+    line-height: normal;
+    text-align: center;
+    -webkit-appearance: none;
+       -moz-appearance: textfield;
+            appearance: textfield;
+}
+
+.wpr-grid-qty-input::-webkit-outer-spin-button,
+.wpr-grid-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.elementor-editor-active .elementor-widget-wpr-woo-grid .wpr-grid-qty {
+    pointer-events: auto;
+}
+
+.wpr-grid-atc-has-qty .added_to_cart {
+    display: none !important;
+}

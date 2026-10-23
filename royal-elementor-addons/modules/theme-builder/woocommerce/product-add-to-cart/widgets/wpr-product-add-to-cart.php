@@ -1545,7 +1545,7 @@ class Wpr_Product_AddToCart extends Widget_Base {
 					'size' => 100,
 				],
 				'selectors' => [
-					'{{WRAPPER}} form.cart .variations select' => 'width: {{SIZE}}{{UNIT}} !important;'
+					'{{WRAPPER}} form.cart .variations select' => 'width: {{SIZE}}{{UNIT}} !important; min-width: {{SIZE}}{{UNIT}} !important;',
 				],
 				'separator' => 'before'
 			]

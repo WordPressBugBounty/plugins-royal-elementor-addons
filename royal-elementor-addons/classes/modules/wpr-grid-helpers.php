@@ -522,6 +522,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 						$cleanedKey = str_replace('wpr_af_', '', $key);
 						$prev_cleaned_key = $cleanedKey;
 
+						if ( ! Utilities::wpr_is_allowed_filter_key( $cleanedKey ) ) {
+							continue;
+						}
+
 						if ( isset($wpr_url_params[$key]) ) {
 							if ( $cleanedKey == 'date_range' ) {
 								$date = $wpr_url_params[$key];

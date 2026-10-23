@@ -16,11 +16,201 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WPR_Media_Grid_Helpers {
 
+	/**
+	 * Hard cap for attachment queries (rejects client-supplied -1 / huge values).
+	 */
+	const MAX_POSTS_PER_PAGE = 100;
+
 	public function __construct() {
 		add_action( 'wp_ajax_wpr_filter_grid_media', [ $this, 'wpr_filter_grid_media' ] );
 		add_action( 'wp_ajax_nopriv_wpr_filter_grid_media', [ $this, 'wpr_filter_grid_media' ] );
 		add_action( 'wp_ajax_wpr_get_media_filtered_count', [ $this, 'wpr_get_media_filtered_count' ] );
 		add_action( 'wp_ajax_nopriv_wpr_get_media_filtered_count', [ $this, 'wpr_get_media_filtered_count' ] );
+		add_filter( 'posts_clauses', [ __CLASS__, 'filter_attachment_parent_clauses' ], 10, 2 );
+	}
+
+	/**
+	 * Cap posts_per_page for media grid queries.
+	 *
+	 * @param mixed $posts_per_page Raw value from settings.
+	 * @return int
+	 */
+	public static function cap_posts_per_page( $posts_per_page ) {
+		$posts_per_page = (int) $posts_per_page;
+
+		if ( $posts_per_page < 1 ) {
+			return self::MAX_POSTS_PER_PAGE;
+		}
+
+		return min( $posts_per_page, self::MAX_POSTS_PER_PAGE );
+	}
+
+	/**
+	 * Load Media Grid widget settings from the saved Elementor document.
+	 * Query-critical keys are never trusted from the request alone.
+	 *
+	 * @param int    $document_id Elementor document ID.
+	 * @param string $widget_id   Elementor widget ID.
+	 * @return array|false
+	 */
+	public static function get_saved_media_grid_settings( $document_id, $widget_id ) {
+		$document_id = absint( $document_id );
+		$widget_id   = sanitize_text_field( (string) $widget_id );
+
+		if ( $document_id < 1 || '' === $widget_id || ! preg_match( '/^[A-Za-z0-9]+$/', $widget_id ) ) {
+			return false;
+		}
+
+		$post_status = get_post_status( $document_id );
+		if ( ! $post_status ) {
+			return false;
+		}
+
+		if ( 'publish' !== $post_status && ! current_user_can( 'read_post', $document_id ) ) {
+			return false;
+		}
+
+		$elements = [];
+		$document = \Elementor\Plugin::$instance->documents->get( $document_id );
+
+		if ( $document ) {
+			$elements = $document->get_elements_data();
+		}
+
+		if ( empty( $elements ) || ! is_array( $elements ) ) {
+			$raw = get_post_meta( $document_id, '_elementor_data', true );
+
+			if ( is_string( $raw ) && '' !== $raw ) {
+				$decoded  = json_decode( wp_unslash( $raw ), true );
+				$elements = is_array( $decoded ) ? $decoded : [];
+			} elseif ( is_array( $raw ) ) {
+				$elements = $raw;
+			}
+		}
+
+		if ( empty( $elements ) || ! is_array( $elements ) ) {
+			return false;
+		}
+
+		$widget_data = Utilities::find_widget_in_elements( $elements, $widget_id );
+		if ( ! $widget_data || 'wpr-media-grid' !== ( $widget_data['widgetType'] ?? '' ) ) {
+			return false;
+		}
+
+		return isset( $widget_data['settings'] ) && is_array( $widget_data['settings'] )
+			? $widget_data['settings']
+			: [];
+	}
+
+	/**
+	 * Overlay query-critical keys from saved widget settings onto request settings.
+	 *
+	 * @param array $request_settings Client-supplied settings (display/render only).
+	 * @param array $saved_settings   Settings from the Elementor document.
+	 * @return array
+	 */
+	public static function bind_ajax_query_settings( $request_settings, $saved_settings ) {
+		if ( ! is_array( $request_settings ) ) {
+			$request_settings = [];
+		}
+		if ( ! is_array( $saved_settings ) ) {
+			$saved_settings = [];
+		}
+
+		$query_keys = [
+			'query_selection',
+			'query_manual_attachment',
+			'query_posts_per_page',
+			'query_exclude_attachment',
+			'query_offset',
+			'query_author',
+			'query_randomize',
+			'order_posts',
+			'order_direction',
+		];
+
+		foreach ( $query_keys as $key ) {
+			if ( array_key_exists( $key, $saved_settings ) ) {
+				$request_settings[ $key ] = $saved_settings[ $key ];
+			} else {
+				unset( $request_settings[ $key ] );
+			}
+		}
+
+		foreach ( $saved_settings as $key => $value ) {
+			if ( 0 === strpos( (string) $key, 'query_taxonomy_' ) ) {
+				$request_settings[ $key ] = $value;
+			}
+		}
+
+		// Drop any request-only taxonomy filters that were not saved on the widget.
+		foreach ( array_keys( $request_settings ) as $key ) {
+			if ( 0 === strpos( (string) $key, 'query_taxonomy_' ) && ! array_key_exists( $key, $saved_settings ) ) {
+				unset( $request_settings[ $key ] );
+			}
+		}
+
+		$request_settings['query_posts_per_page'] = self::cap_posts_per_page(
+			$request_settings['query_posts_per_page'] ?? 10
+		);
+
+		return $request_settings;
+	}
+
+	/**
+	 * Validate media-grid AJAX auth and return settings bound to the saved widget.
+	 *
+	 * @return array|\WP_Error
+	 */
+	public static function get_validated_ajax_settings() {
+		$widget_id   = isset( $_POST['wpr_widget_id'] ) ? sanitize_text_field( wp_unslash( $_POST['wpr_widget_id'] ) ) : '';
+		$document_id = isset( $_POST['wpr_document_id'] ) ? absint( wp_unslash( $_POST['wpr_document_id'] ) ) : 0;
+		$nonce       = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+
+		if ( '' === $widget_id || $document_id < 1 ) {
+			return new \WP_Error( 'wpr_media_grid_auth', esc_html__( 'Security check failed.', 'wpr-addons' ) );
+		}
+
+		// Per-widget nonce (not the shared WprConfig nonce).
+		if ( ! wp_verify_nonce( $nonce, 'wpr_media_grid_' . $widget_id ) ) {
+			return new \WP_Error( 'wpr_media_grid_auth', esc_html__( 'Security check failed.', 'wpr-addons' ) );
+		}
+
+		$saved = self::get_saved_media_grid_settings( $document_id, $widget_id );
+		if ( false === $saved ) {
+			return new \WP_Error( 'wpr_media_grid_auth', esc_html__( 'Security check failed.', 'wpr-addons' ) );
+		}
+
+		$request_settings = isset( $_POST['grid_settings'] ) && is_array( $_POST['grid_settings'] )
+			? wp_unslash( $_POST['grid_settings'] )
+			: [];
+
+		return self::bind_ajax_query_settings( $request_settings, $saved );
+	}
+
+	/**
+	 * Restrict attachment queries to unattached media or media whose parent is
+	 * publicly published without a password.
+	 *
+	 * @param array     $clauses Query clauses.
+	 * @param \WP_Query $query   Query instance.
+	 * @return array
+	 */
+	public static function filter_attachment_parent_clauses( $clauses, $query ) {
+		if ( empty( $query->query['wpr_public_attachments_only'] ) ) {
+			return $clauses;
+		}
+
+		global $wpdb;
+
+		$clauses['join'] .= " LEFT JOIN {$wpdb->posts} AS wpr_att_parent ON ( {$wpdb->posts}.post_parent = wpr_att_parent.ID ) ";
+		$clauses['where'] .= $wpdb->prepare(
+			" AND ( {$wpdb->posts}.post_parent = %d OR ( wpr_att_parent.post_status = %s AND ( wpr_att_parent.post_password = '' OR wpr_att_parent.post_password IS NULL ) ) )",
+			0,
+			'publish'
+		);
+
+		return $clauses;
 	}
 
 	// Get Max Pages
@@ -37,7 +227,8 @@ class WPR_Media_Grid_Helpers {
 			$max_num_pages = intval( ceil( $query->max_num_pages ) );
 
 			$adjusted_total_posts = max( 0, $query->found_posts - $query->query_vars['offset'] );
-			$number_of_pages = ceil( $adjusted_total_posts / $query->query_vars['posts_per_page'] );
+			$ppp = max( 1, (int) $query->query_vars['posts_per_page'] );
+			$number_of_pages = ceil( $adjusted_total_posts / $ppp );
 
 			wp_send_json_success( [
 				'page_count' => $number_of_pages,
@@ -62,6 +253,15 @@ class WPR_Media_Grid_Helpers {
 
 	// Main Query Args
 	public static function get_main_query_args( $settings, $params ) {
+		// Elementor omits unchanged defaults from saved JSON — normalize before querying.
+		$settings['query_selection'] = $settings['query_selection'] ?? 'dynamic';
+		$settings['query_offset'] = ! empty( $settings['query_offset'] ) ? $settings['query_offset'] : 0;
+		$settings['query_randomize'] = $settings['query_randomize'] ?? '';
+		$settings['order_posts'] = $settings['order_posts'] ?? 'date';
+		$settings['order_direction'] = $settings['order_direction'] ?? 'DESC';
+		$settings['query_exclude_attachment'] = $settings['query_exclude_attachment'] ?? [];
+		$settings['query_manual_attachment'] = $settings['query_manual_attachment'] ?? [];
+
 		$author = ! empty( $settings['query_author'] ) ? implode( ',', $settings['query_author'] ) : '';
 
 		if ( get_query_var( 'paged' ) ) {
@@ -72,9 +272,7 @@ class WPR_Media_Grid_Helpers {
 			$paged = 1;
 		}
 
-		if ( empty( $settings['query_offset'] ) ) {
-			$settings['query_offset'] = 0;
-		}
+		$settings['query_posts_per_page'] = self::cap_posts_per_page( $settings['query_posts_per_page'] ?? 10 );
 
 		$offset = ( $paged - 1 ) * $settings['query_posts_per_page'] + $settings['query_offset'];
 
@@ -94,17 +292,18 @@ class WPR_Media_Grid_Helpers {
 			'post_status' => 'inherit',
 			'post_mime_type' => 'image',
 			'tax_query' => self::get_tax_query_args( $settings ),
-			'post__not_in' => $settings['query_exclude_attachment'],
+			'post__not_in' => $settings['query_exclude_attachment'] ?? [],
 			'posts_per_page' => $settings['query_posts_per_page'],
 			'orderby' => $query_order_by,
 			'author' => $author,
 			'paged' => $paged,
 			'offset' => $offset,
+			'wpr_public_attachments_only' => true,
 		];
 
 		if ( 'manual' === $settings['query_selection'] ) {
 			$post_ids = [ '' ];
-			$attachments = $settings['query_manual_attachment'];
+			$attachments = $settings['query_manual_attachment'] ?? [];
 			$attachments_count = ! empty( $attachments ) ? count( $attachments ) : 0;
 
 			for ( $i = 0; $i < $attachments_count; $i++ ) {
@@ -123,6 +322,7 @@ class WPR_Media_Grid_Helpers {
 				'orderby' => $orderby,
 				'paged' => $paged,
 				'posts_per_page' => $settings['query_posts_per_page'],
+				'wpr_public_attachments_only' => true,
 			];
 
 			$tax_query = self::get_tax_query_args( $settings );
@@ -964,32 +1164,29 @@ class WPR_Media_Grid_Helpers {
 	}
 
 	public function wpr_get_media_filtered_count() {
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+		$settings = self::get_validated_ajax_settings();
 
-		if ( ! wp_verify_nonce( $nonce, 'wpr-addons-js' ) ) {
+		if ( is_wp_error( $settings ) ) {
 			wp_send_json_error( [
-				'message' => esc_html__( 'Security check failed.', 'wpr-addons' ),
+				'message' => $settings->get_error_message(),
 			] );
 		}
 
-		if ( isset( $_POST['grid_settings'] ) ) {
-			$settings = $_POST['grid_settings'];
-			self::get_max_num_pages( $settings );
-		}
+		// Ensure get_max_num_pages takes the AJAX JSON branch.
+		$_POST['grid_settings'] = $settings;
+		self::get_max_num_pages( $settings );
 
 		wp_die();
 	}
 
 	public function wpr_filter_grid_media() {
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+		$settings = self::get_validated_ajax_settings();
 
-		if ( ! wp_verify_nonce( $nonce, 'wpr-addons-js' ) ) {
+		if ( is_wp_error( $settings ) ) {
 			wp_send_json_error( [
-				'message' => esc_html__( 'Security check failed.', 'wpr-addons' ),
+				'message' => $settings->get_error_message(),
 			] );
 		}
-
-		$settings = isset( $_POST['grid_settings'] ) && is_array( $_POST['grid_settings'] ) ? $_POST['grid_settings'] : [];
 
 		$start = microtime( true );
 

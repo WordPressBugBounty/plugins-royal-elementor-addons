@@ -2032,7 +2032,7 @@ class Wpr_Icon_Box extends Widget_Base {
 			endif; ?>
 
 			<div <?php echo $this->get_render_attribute_string( 'wpr-icon-box-badge-attr' ); ?>>
-				<div class="wpr-icon-box-badge-inner"><?php echo $settings['badge_title']; ?></div>
+				<div class="wpr-icon-box-badge-inner"><?php echo esc_html( $settings['badge_title'] ); ?></div>
 			</div>
 		<?php endif;
 	}
