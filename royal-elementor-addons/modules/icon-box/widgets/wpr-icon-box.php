@@ -2032,27 +2032,15 @@ class Wpr_Icon_Box extends Widget_Base {
 			endif; ?>
 
 			<div <?php echo $this->get_render_attribute_string( 'wpr-icon-box-badge-attr' ); ?>>
-				<div class="wpr-icon-box-badge-inner"><?php echo $settings['badge_title']; ?></div>
+				<div class="wpr-icon-box-badge-inner"><?php echo esc_html( $settings['badge_title'] ); ?></div>
 			</div>
 		<?php endif;
 	}
 
 	// Get Animation Class
 	public function get_animation_class( $data, $object ) {
-		$class = '';
-
-		// Animation Class
-		if ( 'none' !== $data[ $object .'_animation'] ) {
-			$class .= ' wpr-'. $object .'-'. $data[ $object .'_animation'];
-			$class .= ' wpr-anim-size-'. $data[ $object .'_animation_size'];
-			$class .= ' wpr-anim-timing-'. $data[ $object .'_animation_timing'];
-
-			if ( 'yes' === $data[ $object .'_animation_tr'] ) {
-				$class .= ' wpr-anim-transparency';
-			}
-		}
-
-		return str_replace('watermark', 'element', $class);
+		// Watermark animations reuse the element animation class names.
+		return str_replace( 'watermark', 'element', Utilities::build_animation_class( $data, $object ) );
 	}
 
     protected function render() {
@@ -2104,7 +2092,7 @@ class Wpr_Icon_Box extends Widget_Base {
                                 \Elementor\Icons_Manager::render_icon( $settings['icon_box_icon'], [ 'aria-hidden' => 'true' ] );
                             } else {
                                 $src = \Elementor\Group_Control_Image_Size::get_attachment_image_src( $settings['icon_box_image']['id'], 'thumbnail', $settings );
-                                echo '<img src="'. $src .'">';
+                                echo '<img src="'. esc_url( is_string( $src ) ? $src : '' ) .'">';
                             }
 
                         echo '</div>';
@@ -2129,7 +2117,7 @@ class Wpr_Icon_Box extends Widget_Base {
                                 echo '<a class="wpr-icon-box-btn"'. $this->get_render_attribute_string( 'icon_box_url' ) .'>';
         
                                     if ( '' !== $settings['icon_box_btn_text'] ) :
-                                    echo '<span class="wpr-icon-box-btn-text">'. $settings['icon_box_btn_text'] .'</span>';		
+                                    echo '<span class="wpr-icon-box-btn-text">'. wp_kses_post( $settings['icon_box_btn_text'] ) .'</span>';		
                                     endif;
 
                                 echo '</a>';
@@ -2140,7 +2128,7 @@ class Wpr_Icon_Box extends Widget_Base {
 					
 					if ( 'yes' !== $settings['enable_mouse_tilt'] && 'none' !== $settings['watermark'] ) {
 
-						echo '<div class="wpr-watermark-wrap '. $this->get_animation_class( $settings, 'watermark' ) .'">';
+						echo '<div class="wpr-watermark-wrap '. esc_attr( $this->get_animation_class( $settings, 'watermark' ) ) .'">';
 							
 							if ( 'icon' === $settings['watermark'] ) {
 								\Elementor\Icons_Manager::render_icon( $settings['watermark_icon'], [ 'aria-hidden' => 'true' ] );

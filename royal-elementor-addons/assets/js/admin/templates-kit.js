@@ -6,6 +6,7 @@ jQuery(document).ready(function( $ ) {
 		requiredTheme: false,
 		requiredPlugins: false,
 		lazyImages: [],
+		gridScrollTop: 0,
 
 		init: function() {
 			// Overlay Click
@@ -382,9 +383,12 @@ jQuery(document).ready(function( $ ) {
 			$('.wpr-templates-kit-price-filter').show();
 			$('.wpr-templates-kit-category-filters').show();
 			$('.wpr-templates-kit-logo').find('.back-btn').css('display', 'none');
+			window.scrollTo( 0, WprTemplatesKit.gridScrollTop );
 		},
 
 		showImportPage: function( kit ) {
+			WprTemplatesKit.gridScrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+
 			$('.wpr-templates-kit-page-title').hide();
 			$('.wpr-templates-kit-grid.main-grid').hide();
 			$('.wpr-templates-kit-search').hide();
@@ -402,6 +406,8 @@ jQuery(document).ready(function( $ ) {
 			} else {
 				$('.wpr-templates-kit-expert-notice').hide();
 			}
+
+			window.scrollTo( 0, 0 );
 		},
 
 		renderImportPage: function( kit ) {

@@ -266,6 +266,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 		return true;
 	}
 
+	/**
+	 * `_price` is public catalog data only on WooCommerce product queries.
+	 *
+	 * @param array $settings Grid settings.
+	 * @return bool
+	 */
+	public static function wpr_query_allows_price_meta( $settings ) {
+		if ( empty( $settings ) || ! is_array( $settings ) ) {
+			return false;
+		}
+
+		$source = isset( $settings['query_source'] ) ? $settings['query_source'] : '';
+
+		if ( 'current' === $source ) {
+			$types = isset( $settings['current_query_source'] ) ? (array) $settings['current_query_source'] : [];
+		} elseif ( 'related' === $source ) {
+			$types = [ get_post_type( get_the_ID() ) ];
+		} else {
+			$types = (array) $source;
+		}
+
+		$types = array_filter( array_map( 'sanitize_key', $types ) );
+
+		if ( empty( $types ) ) {
+			return false;
+		}
+
+		foreach ( $types as $type ) {
+			if ( 'product' !== $type && 'product_variation' !== $type ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	// Main Query Args
 	public static function get_main_query_args($settings, $params) {
 		$author = ! empty( $settings[ 'query_author' ] ) ? implode( ',', $settings[ 'query_author' ] ) : '';
@@ -521,6 +557,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 						// Need to setup logic to get relation from filters separately
 						$cleanedKey = str_replace('wpr_af_', '', $key);
 						$prev_cleaned_key = $cleanedKey;
+
+						if ( ! Utilities::wpr_is_allowed_filter_key( $cleanedKey, self::wpr_query_allows_price_meta( $settings ) ) ) {
+							continue;
+						}
 
 						if ( isset($wpr_url_params[$key]) ) {
 							if ( $cleanedKey == 'date_range' ) {
@@ -791,18 +831,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			}
 		}
 
-		// Animation Class
-		if ( 'none' !== $data[ $object .'_animation'] ) {
-			$class .= ' wpr-'. $object .'-'. $data[ $object .'_animation'];
-			$class .= ' wpr-anim-size-'. $data[ $object .'_animation_size'];
-			$class .= ' wpr-anim-timing-'. $data[ $object .'_animation_timing'];
-
-			if ( 'yes' === $data[ $object .'_animation_tr'] ) {
-				$class .= ' wpr-anim-transparency';
-			}
-		}
-
-		return $class;
+		return Utilities::build_animation_class( $data, $object );
 	}
 
 	// Get Image Effect Class

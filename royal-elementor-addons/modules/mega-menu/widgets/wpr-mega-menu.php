@@ -1388,6 +1388,88 @@ class Wpr_Mega_Menu extends Widget_Base {
 		);
 
 		$this->add_control(
+			'sub_menu_align',
+			[
+				'label' => esc_html__( 'Align', 'wpr-addons' ),
+				'type' => Controls_Manager::CHOOSE,
+				'label_block' => false,
+				'options' => [
+					'left' => [
+						'title' => esc_html__( 'Left', 'wpr-addons' ),
+						'icon' => 'eicon-h-align-left',
+					],
+					'right' => [
+						'title' => esc_html__( 'Right', 'wpr-addons' ),
+						'icon' => 'eicon-h-align-right',
+					],
+				],
+				'selectors_dictionary' => [
+					'left' => 'left: 0; right: auto;',
+					'right' => 'right: 0; left: auto;',
+				],
+				'selectors' => [
+					'{{WRAPPER}} .wpr-nav-menu-horizontal .wpr-nav-menu > li > .wpr-sub-menu' => '{{VALUE}}',
+				],
+				'condition' => [
+					'menu_layout' => 'horizontal',
+				],
+				'separator' => 'before',
+			]
+		);
+
+		$this->add_responsive_control(
+			'sub_menu_offset_hr',
+			[
+				'label' => esc_html__( 'Horizontal Offset (Left)', 'wpr-addons' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%' ],
+				'range' => [
+					'px' => [
+						'min' => -50,
+						'max' => 50,
+					],
+					'%' => [
+						'min' => -100,
+						'max' => 100,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .wpr-nav-menu-horizontal .wpr-nav-menu > li > .wpr-sub-menu' => 'left: {{SIZE}}{{UNIT}};',
+				],
+				'condition' => [
+					'menu_layout' => 'horizontal',
+					'sub_menu_align' => 'left',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'sub_menu_offset_hr_right',
+			[
+				'label' => esc_html__( 'Horizontal Offset (Right)', 'wpr-addons' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%' ],
+				'range' => [
+					'px' => [
+						'min' => -50,
+						'max' => 50,
+					],
+					'%' => [
+						'min' => -100,
+						'max' => 100,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .wpr-nav-menu-horizontal .wpr-nav-menu > li > .wpr-sub-menu' => 'right: {{SIZE}}{{UNIT}};',
+				],
+				'condition' => [
+					'menu_layout' => 'horizontal',
+					'sub_menu_align' => 'right',
+				],
+			]
+		);
+
+		$this->add_control(
 			'sub_menu_divider',
 			[
 				'label' => esc_html__( 'Item Divider', 'wpr-addons' ),
@@ -1784,6 +1866,24 @@ class Wpr_Mega_Menu extends Widget_Base {
 					'{{WRAPPER}} .wpr-mobile-mega-menu-wrap' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					'{{WRAPPER}}.wpr-mobile-menu-display-offcanvas .wpr-mobile-sub-mega-menu' => 'margin-left: {{LEFT}}{{UNIT}};',
 					'{{WRAPPER}}.wpr-mobile-menu-display-offcanvas .wpr-mobile-mega-menu > li > .wpr-mobile-sub-menu' => 'margin-left: {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'mobile_menu_general_margin',
+			[
+				'label' => esc_html__( 'Margin', 'wpr-addons' ),
+				'type' => Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', '%' ],
+				'default' => [
+					'top' => 0,
+					'right' => 0,
+					'bottom' => 0,
+					'left' => 0,
+				],
+				'selectors' => [
+					'{{WRAPPER}} .wpr-mobile-mega-menu-wrap' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
 		);

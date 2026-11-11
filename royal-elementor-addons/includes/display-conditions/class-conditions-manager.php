@@ -111,6 +111,10 @@ class WPR_DC_Conditions_Manager {
 		// Without this, the first render result gets cached and served to all users,
 		// breaking role-based and other dynamic visibility logic.
 		add_filter( 'elementor/element/is_dynamic_content', [ $this, 'disable_element_caching' ], 10, 2 );
+
+		// Page Types is a SELECT2. Elementor does not validate its values on save,
+		// so drop anything that is not one of the control options before it is stored.
+		add_filter( 'elementor/document/save/data', [ 'WPR_DC_Section_Archive', 'sanitize_saved_document' ] );
 	}
 
 	/**

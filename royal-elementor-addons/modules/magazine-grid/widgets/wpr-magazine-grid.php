@@ -5154,20 +5154,7 @@ class Wpr_Magazine_Grid extends Widget_Base {
 
 	// Get Animation Class
 	public function get_animation_class( $data, $object ) {
-		$class = '';
-
-		// Animation Class
-		if ( 'none' !== $data[ $object .'_animation'] ) {
-			$class .= ' wpr-'. $object .'-'. $data[ $object .'_animation'];
-			$class .= ' wpr-anim-size-'. $data[ $object .'_animation_size'];
-			$class .= ' wpr-anim-timing-'. $data[ $object .'_animation_timing'];
-
-			if ( 'yes' === $data[ $object .'_animation_tr'] ) {
-				$class .= ' wpr-anim-transparency';
-			}
-		}
-
-		return $class;
+		return Utilities::build_animation_class( $data, $object );
 	}
 
 	// Render Password Protected Input

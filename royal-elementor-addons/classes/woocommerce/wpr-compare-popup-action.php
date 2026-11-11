@@ -28,19 +28,20 @@ class WPR_Compare_Popup_Action {
 
     function wpr_get_page_content($request) {
 
-        $page_id = $_POST['wpr_compare_page_id'];
-
-        if ( post_password_required($page_id) || 'publish' !== get_post_status($page_id) ) {
-            wp_send_json_error(array(
-                'message' => esc_html__('Security check failed.', 'wpr-addons'),
-            ));
-        }
-
-		if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'wpr-addons-js')) {
-			wp_send_json_error(array(
-				'message' => esc_html__('Security check failed.', 'wpr-addons'),
-			));
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wpr-addons-js' ) ) {
+			wp_send_json_error( [
+				'message' => esc_html__( 'Security check failed.', 'wpr-addons' ),
+			] );
 		}
+
+        $page_id = isset( $_POST['wpr_compare_page_id'] ) ? absint( wp_unslash( $_POST['wpr_compare_page_id'] ) ) : 0;
+        $page    = $page_id ? get_post( $page_id ) : null;
+
+        if ( ! $page || post_password_required( $page_id ) || 'publish' !== get_post_status( $page_id ) || ! is_post_type_viewable( get_post_type( $page ) ) ) {
+            wp_send_json_error( [
+                'message' => esc_html__( 'Security check failed.', 'wpr-addons' ),
+            ] );
+        }
 
         // $page_id = $request->get_param('id');
         
@@ -48,18 +49,12 @@ class WPR_Compare_Popup_Action {
         if (\Elementor\Plugin::$instance->db->is_built_with_elementor($page_id)) {
             Utilities::enqueue_inner_template_assets( $page_id );
             $content = \Elementor\Plugin::$instance->frontend->get_builder_content($page_id);
-            wp_send_json_success(array('content' => $content, 'page_url' => get_page_link( $page_id )));
+            wp_send_json_success( [ 'content' => $content, 'page_url' => get_page_link( $page_id ) ] );
             // return new WP_REST_Response(array('content' => $content), 200);
         } else {
-            $page = get_post($page_id);  
-            if ($page) {
-                $content = apply_filters('the_content', $page->post_content);
-                wp_send_json_success(array('content' => $content));
-                // return new WP_REST_Response(array('content' => $content), 200);
-            } else {
-                wp_send_json_error(array('message' => 'Page not found'));
-                // return new WP_Error('page_not_found', 'Page not found', array('status' => 404));
-            }
+            $content = apply_filters( 'the_content', $page->post_content );
+            wp_send_json_success( [ 'content' => $content ] );
+            // return new WP_REST_Response(array('content' => $content), 200);
         }
         wp_die();
     }

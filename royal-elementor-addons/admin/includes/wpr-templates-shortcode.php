@@ -28,18 +28,6 @@ class WPR_Templates_Shortcode {
 			$id = intval($attributes['id']);
 		}
 
-		// Ensure only publicly published posts can be accessed
-		$post = get_post($id);
-
-		if (!$post || $post->post_status !== 'publish' || in_array($post->post_status, ['draft', 'private', 'future'])) {
-			return 'You do not have permission to view this post.';
-		}
-	
-		// Optionally check if the post is password protected
-		if (post_password_required($post)) {
-			return 'This post is password protected.';
-		}
-	
 		// WPML language handling
 		if (defined('ICL_LANGUAGE_CODE')) {
 			$default_language_code = apply_filters('wpml_default_language', null);
@@ -47,6 +35,10 @@ class WPR_Templates_Shortcode {
 			if ( ICL_LANGUAGE_CODE !== $default_language_code ) {
 				$id = icl_object_id($id, 'elementor_library', false, ICL_LANGUAGE_CODE);
 			}
+		}
+
+		if ( ! \WprAddons\Classes\Utilities::can_render_elementor_template( $id ) ) {
+			return '';
 		}
 
 		$edit_link = '<span class="wpr-template-edit-btn" data-permalink="'. esc_url(get_permalink($id)) .'">Edit Template</span>';

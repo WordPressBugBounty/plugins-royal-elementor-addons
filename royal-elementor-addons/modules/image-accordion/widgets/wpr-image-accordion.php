@@ -2198,23 +2198,6 @@ class Wpr_Image_Accordion extends Widget_Base {
 	}
 
 	/**
-	 * Allowed keys for wpr-animations / wpr-animations-alt controls.
-	 *
-	 * @return string[]
-	 */
-	protected function get_allowed_animation_keys() {
-		$keys = [ 'none' ];
-
-		foreach ( \WprAddons\Includes\Controls\WPR_Control_Animations::get_animations() as $group ) {
-			if ( is_array( $group ) ) {
-				$keys = array_merge( $keys, array_map( 'strval', array_keys( $group ) ) );
-			}
-		}
-
-		return array_values( array_unique( $keys ) );
-	}
-
-	/**
 	 * Allowed keys for wpr-button-animations control.
 	 *
 	 * @return string[]
@@ -2233,36 +2216,7 @@ class Wpr_Image_Accordion extends Widget_Base {
 	
 	// Get Animation Class
 	public function get_animation_class( $data, $object ) {
-		$class = '';
-
-		$animation = Utilities::validate_option(
-			$data[ $object . '_animation' ] ?? '',
-			$this->get_allowed_animation_keys(),
-			'none'
-		);
-		$size = Utilities::validate_option(
-			$data[ $object . '_animation_size' ] ?? '',
-			[ 'small', 'medium', 'large' ],
-			'large'
-		);
-		$timing = Utilities::validate_option(
-			$data[ $object . '_animation_timing' ] ?? '',
-			array_keys( Utilities::wpr_animation_timings() ),
-			'ease-default'
-		);
-
-		// Animation Class
-		if ( 'none' !== $animation ) {
-			$class .= ' wpr-'. $object .'-'. $animation;
-			$class .= ' wpr-anim-size-'. $size;
-			$class .= ' wpr-anim-timing-'. $timing;
-
-			if ( 'yes' === ( $data[ $object . '_animation_tr' ] ?? '' ) ) {
-				$class .= ' wpr-anim-transparency';
-			}
-		}
-
-		return $class;
+		return Utilities::build_animation_class( $data, $object );
 	}
 
 	// Render Post Title

@@ -17,23 +17,10 @@ class WPR_Templates_Loop {
 	** Loop Through Custom Templates
 	*/
 	public static function render_theme_builder_templates( $template ) {
-		// WP_Query arguments
-		$args = array (
-			'post_type'   => array( 'wpr_templates' ),
-			'post_status' => array( 'publish' ),
-			'posts_per_page' => -1,
-			'tax_query'   => array(
-				array(
-					'taxonomy' => 'wpr_template_type',
-					'field'    => 'slug',
-					'terms'    => [ $template, 'user' ],
-					'operator' => 'AND'
-				)
-			)
-		);
-
-		// The Query
-		$user_templates = get_posts( $args );
+		// Slug tax_query with AND resolves every term that shares the slug. Duplicate
+		// header/user terms make that list longer than the two terms on a template, so
+		// the query matches nothing. Use the original term ID for each slug instead.
+		$user_templates = self::get_user_templates_by_type( $template );
 
 		// The Loop
 		echo '<ul class="wpr-'. esc_attr($template) .'-templates-list wpr-my-templates-list" data-pro="'. esc_attr(defined('WPR_ADDONS_PRO_VERSION') && wpr_fs()->can_use_premium_code()) .'">';
@@ -76,6 +63,53 @@ class WPR_Templates_Loop {
 		// Restore original Post Data
 		wp_reset_postdata();
 
+	}
+
+	/**
+	 * Published user templates of one type (header, footer, …).
+	 * One term ID per slug, the oldest, so duplicate translated terms are not required by AND.
+	 *
+	 * @param string $template Template type slug.
+	 * @return \WP_Post[]
+	 */
+	private static function get_user_templates_by_type( $template ) {
+		global $wpdb;
+
+		$term_ids = [];
+
+		foreach ( [ $template, 'user' ] as $slug ) {
+			$term_ids[] = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT tt.term_taxonomy_id
+					FROM {$wpdb->terms} t
+					INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_id = t.term_id
+					WHERE tt.taxonomy = 'wpr_template_type' AND t.slug = %s
+					ORDER BY t.term_id ASC
+					LIMIT 1",
+					$slug
+				)
+			);
+		}
+
+		if ( in_array( 0, $term_ids, true ) ) {
+			return [];
+		}
+
+		return get_posts( [
+			'post_type'        => 'wpr_templates',
+			'post_status'      => 'publish',
+			'posts_per_page'   => -1,
+			'suppress_filters' => true,
+			'tax_query'        => [
+				[
+					'taxonomy'         => 'wpr_template_type',
+					'field'            => 'term_taxonomy_id',
+					'terms'            => $term_ids,
+					'operator'         => 'AND',
+					'include_children' => false,
+				],
+			],
+		] );
 	}
 
 	/**
@@ -227,7 +261,7 @@ class WPR_Templates_Loop {
 										<?php // Custom Taxonomies
 											$custom_taxonomies = Utilities::get_custom_types_of( 'tax', true );
 											foreach ($custom_taxonomies as $key => $value) {
-												if ( 'product_cat' === $key || 'product_tag' === $key ) {
+												if ( Utilities::is_product_related_taxonomy( $key ) ) {
 													continue;
 												}
 
@@ -373,7 +407,7 @@ class WPR_Templates_Loop {
 										<?php // Custom Taxonomies
 											$custom_taxonomies = Utilities::get_custom_types_of( 'tax', true );
 											foreach ($custom_taxonomies as $key => $value) {
-												if ( 'product_cat' === $key || 'product_tag' === $key ) {
+												if ( Utilities::is_product_related_taxonomy( $key ) ) {
 													continue;
 												}
 

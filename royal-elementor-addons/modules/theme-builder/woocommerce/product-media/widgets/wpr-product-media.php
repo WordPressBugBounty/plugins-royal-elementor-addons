@@ -463,7 +463,7 @@ class Wpr_Product_Media extends Widget_Base {
 			[
 				'name' => 'media_border',
 				'label' => esc_html__( 'Border', 'wpr-addons' ),
-				'selector' => '{{WRAPPER}} .woocommerce-product-gallery__image',
+				'selector' => '{{WRAPPER}} .flex-viewport',
 			]
 		);
 
@@ -480,6 +480,7 @@ class Wpr_Product_Media extends Widget_Base {
 					'left' => 0,
 				],
 				'selectors' => [
+					'{{WRAPPER}} .flex-viewport' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					'{{WRAPPER}} .woocommerce-product-gallery__image' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					'{{WRAPPER}} .woocommerce-product-gallery__image img' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],

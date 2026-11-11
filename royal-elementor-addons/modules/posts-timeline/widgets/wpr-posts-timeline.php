@@ -5372,20 +5372,7 @@ class Wpr_Posts_Timeline extends Widget_Base {
 
 	// Get Animation Class
 	public function get_animation_class( $data, $object ) {
-		$class = '';
-
-		// Animation Class
-		if ( 'none' !== $data[ $object .'_animation'] ) {
-			$class .= ' wpr-'. $object .'-'. $data[ $object .'_animation'];
-			$class .= ' wpr-anim-size-'. $data[ $object .'_animation_size'];
-			$class .= ' wpr-anim-timing-'. $data[ $object .'_animation_timing'];
-
-			if ( 'yes' === $data[ $object .'_animation_tr'] ) {
-				$class .= ' wpr-anim-transparency';
-			}
-		}
-
-		return $class;
+		return Utilities::build_animation_class( $data, $object );
 	}
 
 	public static function youtube_url ( $story_settings ) {
@@ -5771,7 +5758,7 @@ class Wpr_Posts_Timeline extends Widget_Base {
 		$this->horizontal_timeline_classes($settings);
 
 		echo '<div class="wpr-timeline-outer-container">';
-		echo '<div class="wpr-wrapper swiper '. esc_attr($this->horizontal_inner_class) .'" dir="'. esc_attr($dir) .'" data-slidestoshow = "'. esc_attr($this->slides_to_show) .'" data-autoplay="'. esc_attr($autoplay) .'" data-loop="'. esc_attr($loop) .'" data-swiper-speed="'. esc_attr($swiper_speed) .'" data-swiper-delay="'. esc_attr($swiper_delay) .'" data-swiper-poh="'. $swiper_pause_on_hover .'" data-swiper-space-between="'. esc_attr($settings['story_info_gutter']) .'">';
+		echo '<div class="wpr-wrapper swiper '. esc_attr($this->horizontal_inner_class) .'" dir="'. esc_attr($dir) .'" data-slidestoshow = "'. esc_attr($this->slides_to_show) .'" data-autoplay="'. esc_attr($autoplay) .'" data-loop="'. esc_attr($loop) .'" data-swiper-speed="'. esc_attr($swiper_speed) .'" data-swiper-delay="'. esc_attr($swiper_delay) .'" data-swiper-poh="'. esc_attr( $swiper_pause_on_hover ) .'" data-swiper-space-between="'. esc_attr($settings['story_info_gutter']) .'">';
 
 		echo '<div class="swiper-wrapper '. esc_attr($this->horizontal_timeline_class) .'">';
 			if ( is_array($data) ) {
@@ -5853,7 +5840,7 @@ class Wpr_Posts_Timeline extends Widget_Base {
 		if( $this->my_query->have_posts() ) { 
 		
 		echo '<div class="wpr-timeline-outer-container">';
-				echo '<div class="wpr-wrapper swiper '. esc_attr($this->horizontal_inner_class) .'" dir="'. esc_attr($dir) .'" data-slidestoshow = "'. esc_attr($this->slides_to_show) .'" data-autoplay="'. esc_attr($autoplay) .'"  data-loop="'. esc_attr($loop) .'" data-swiper-speed="'. esc_attr($swiper_speed) .'" data-swiper-delay="'. esc_attr($swiper_delay) .'" data-swiper-poh="'. $swiper_pause_on_hover .'" data-swiper-space-between="'. esc_attr($settings['story_info_gutter']) .'">
+				echo '<div class="wpr-wrapper swiper '. esc_attr($this->horizontal_inner_class) .'" dir="'. esc_attr($dir) .'" data-slidestoshow = "'. esc_attr($this->slides_to_show) .'" data-autoplay="'. esc_attr($autoplay) .'"  data-loop="'. esc_attr($loop) .'" data-swiper-speed="'. esc_attr($swiper_speed) .'" data-swiper-delay="'. esc_attr($swiper_delay) .'" data-swiper-poh="'. esc_attr( $swiper_pause_on_hover ) .'" data-swiper-space-between="'. esc_attr($settings['story_info_gutter']) .'">
 					<div class="'. esc_attr($this->horizontal_timeline_class) .' swiper-wrapper">';
 					while( $this->my_query->have_posts() ) {
 						$this->my_query->the_post();

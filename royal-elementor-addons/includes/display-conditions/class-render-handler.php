@@ -88,7 +88,7 @@ class WPR_DC_Render_Handler {
 			echo wp_kses_post( $settings['wpr_dc_fallback_text'] );
 		} elseif ( 'template' === $type && ! empty( $settings['wpr_dc_fallback_template'] ) ) {
 			$template_id = absint( $settings['wpr_dc_fallback_template'] );
-			if ( $template_id ) {
+			if ( $template_id && \WprAddons\Classes\Utilities::can_render_elementor_template( $template_id ) ) {
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo \Elementor\Plugin::instance()->frontend->get_builder_content_for_display( $template_id );
 			}

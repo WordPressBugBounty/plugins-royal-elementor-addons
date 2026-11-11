@@ -641,6 +641,30 @@ class Wpr_Google_Maps extends Widget_Base {
 		);
 
 		$this->add_responsive_control(
+			'infow_window_width',
+			[
+				'label' => esc_html__( 'Width', 'wpr-addons' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%' ],
+				'range' => [
+					'px' => [
+						'min' => 50,
+						'max' => 500,
+					],
+					'%' => [
+						'min' => 10,
+						'max' => 100,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .wpr-google-map .gm-style-iw-c' => 'max-width: {{SIZE}}{{UNIT}} !important;',
+					'{{WRAPPER}} .wpr-google-map .gm-style-iw-d' => 'max-width: {{SIZE}}{{UNIT}} !important;',
+				],
+				'separator' => 'before',
+			]
+		);
+
+		$this->add_responsive_control(
 			'infow_window_padding',
 			[
 				'label' => esc_html__( 'Padding', 'wpr-addons' ),
@@ -655,7 +679,6 @@ class Wpr_Google_Maps extends Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .wpr-google-map .gm-style-iw-c .wpr-gm-iwindow' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
-				'separator' => 'before',
 			]
 		);
 
@@ -770,13 +793,17 @@ class Wpr_Google_Maps extends Widget_Base {
 		$settings = $this->get_settings();
 		
 		if ( 'without_api_key' === $settings['gm_integration'] ) {
-			$latitude  = $settings['gm_latitude'] ?? '';
-			$longitude = $settings['gm_longtitude'] ?? '';
-			$gm_location_title = $settings['gm_location_title'] ?? '';
-			$zoom = !empty($settings['gm_zoom_depth']['size']) ? intval($settings['gm_zoom_depth']['size']) : 14;
+			$latitude  = isset( $settings['gm_latitude'] ) ? sanitize_text_field( $settings['gm_latitude'] ) : '';
+			$longitude = isset( $settings['gm_longtitude'] ) ? sanitize_text_field( $settings['gm_longtitude'] ) : '';
+			$gm_location_title = isset( $settings['gm_location_title'] ) ? sanitize_text_field( $settings['gm_location_title'] ) : '';
+			$zoom = !empty($settings['gm_zoom_depth']['size']) ? absint($settings['gm_zoom_depth']['size']) : 14;
+			$map_height = isset( $settings['gm_height']['size'] ) ? absint( $settings['gm_height']['size'] ) : 500;
+			if ( $map_height < 1 ) {
+				$map_height = 500;
+			}
 	
 			if ($latitude && $longitude) {
-				$map_src = "https://www.google.com/maps?q={$latitude},{$longitude}&z={$zoom}&output=embed";
+				$map_src = 'https://www.google.com/maps?q=' . rawurlencode( $latitude ) . ',' . rawurlencode( $longitude ) . '&z=' . $zoom . '&output=embed';
 			} else {
 				$map_src = "https://www.google.com/maps?q=" . rawurlencode($gm_location_title) . "&z={$zoom}&output=embed";
 			}
@@ -785,7 +812,7 @@ class Wpr_Google_Maps extends Widget_Base {
 			echo '<iframe 
 					src="' . esc_url($map_src) . '" 
 					width="100%"
-					height="'. $settings['gm_height']['size'] .'"
+					height="'. esc_attr( $map_height ) .'"
 					style="border:0;" 
 					allowfullscreen="" 
 					loading="lazy"

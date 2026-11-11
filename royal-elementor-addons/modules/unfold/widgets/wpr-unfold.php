@@ -59,6 +59,10 @@ class Wpr_Unfold extends Widget_Base {
 			}
 		}
 
+		if ( ! Utilities::can_render_elementor_template( $id ) ) {
+			return '';
+		}
+
 		$edit_link = '<span class="wpr-template-edit-btn" data-permalink="' . esc_url( get_permalink( $id ) ) . '">Edit Template</span>';
 
 		$type = get_post_meta( get_the_ID(), '_wpr_template_type', true ) || get_post_meta( $id, '_elementor_template_type', true );
@@ -374,8 +378,13 @@ class Wpr_Unfold extends Widget_Base {
 						'icon' => 'eicon-text-align-right',
 					],
 				],
+				'selectors_dictionary' => [
+					'flex-start' => 'align-self: flex-start; text-align: left;',
+					'center' => 'align-self: center; text-align: center;',
+					'flex-end' => 'align-self: flex-end; text-align: right;',
+				],
 				'selectors' => [
-					'{{WRAPPER}} .wpr-unfold-heading' => 'align-self: {{VALUE}};',
+					'{{WRAPPER}} .wpr-unfold-heading' => '{{VALUE}}',
 				],
 				'default' => 'flex-start',
 				'separator' => 'before',

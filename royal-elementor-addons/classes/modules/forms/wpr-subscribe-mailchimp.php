@@ -28,36 +28,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 	*/
 	public static function wpr_form_builder_mailchimp() {
 
-        $nonce = $_POST['nonce'];
+        $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
 
-        if ( !wp_verify_nonce( $nonce, 'wpr-addons-js' ) ) {
+        if ( ! wp_verify_nonce( $nonce, 'wpr-addons-js' ) ) {
             return; // Get out of here, the nonce is rotten!
         }
-		
-		// API Key
-        $api_key = get_option('wpr_mailchimp_api_key') ? get_option('wpr_mailchimp_api_key') : '';
-        
-        // Validate API key format
-        if (!preg_match('/^[0-9a-f]{32}-[a-z]{2}[0-9]{1,2}$/', $api_key)) {
-            wp_send_json_error('Invalid API key format');
-            return;
-        }
 
-        $api_parts = explode('-', $api_key);
-        if (count($api_parts) !== 2) {
-            wp_send_json_error('Invalid API key format');
-            return;
-        }
+		$document_id = isset( $_POST['wpr_form_document_id'] ) ? absint( wp_unslash( $_POST['wpr_form_document_id'] ) ) : 0;
+		$widget_id   = isset( $_POST['wpr_form_id'] ) ? sanitize_text_field( wp_unslash( $_POST['wpr_form_id'] ) ) : '';
+		$list_id     = isset( $_POST['listId'] ) ? sanitize_text_field( wp_unslash( $_POST['listId'] ) ) : '';
 
-        // Validate datacenter suffix
-        $api_key_suffix = $api_parts[1];
-        if (!preg_match('/^[a-z]{2}[0-9]{1,2}$/', $api_key_suffix)) {
-            wp_send_json_error('Invalid API datacenter');
-            return;
-        }
+		if ( ! Utilities::wpr_verify_mailchimp_audience( $document_id, $widget_id, 'wpr-form-builder', $list_id ) ) {
+			wp_send_json_error( [
+				'action'  => 'wpr_form_builder_mailchimp',
+				'status'  => 'error',
+				'message' => esc_html__( 'Mailchimp subscription failed', 'wpr-addons' ),
+			] );
+		}
 
-        // List ID with sanitization
-        $list_id = isset($_POST['listId']) ? sanitize_text_field(wp_unslash($_POST['listId'])) : '';
+		$api = Utilities::wpr_mailchimp_api_parts();
+		if ( ! $api ) {
+			wp_send_json_error( [
+				'action'  => 'wpr_form_builder_mailchimp',
+				'status'  => 'error',
+				'message' => esc_html__( 'Mailchimp subscription failed', 'wpr-addons' ),
+			] );
+		}
+
+		$api_key        = $api['key'];
+		$api_key_suffix = $api['dc'];
 
         // Get Available Fields (PHPCS - fields are sanitized later on input)
         $fields = isset($_POST['form_data']) ? $_POST['form_data'] : []; // phpcs:ignore
@@ -86,11 +85,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 			]);
 		}
 
+        $email = isset( $fields['email_field'] ) ? sanitize_email( $fields['email_field'] ) : '';
+        if ( ! is_email( $email ) ) {
+			wp_send_json_error( [
+				'action'  => 'wpr_form_builder_mailchimp',
+				'status'  => 'error',
+				'message' => esc_html__( 'Mailchimp subscription failed', 'wpr-addons' ),
+			] );
+        }
+
         // API URL
-        $api_url = 'https://'. $api_key_suffix .'.api.mailchimp.com/3.0/lists/'. $list_id .'/members/'. md5(strtolower(sanitize_text_field($fields['email_field'])));
+        $api_url = 'https://'. $api_key_suffix .'.api.mailchimp.com/3.0/lists/'. $list_id .'/members/'. md5( strtolower( $email ) );
 		
 		$api_body = [
-			'email_address' => sanitize_text_field($fields[ 'email_field' ]),
+			'email_address' => $email,
 			'status' => 'subscribed',
 			'merge_fields' => $merge_fields
 		];
@@ -119,30 +127,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 			if ( ! empty($request) ) {
 				if ($request->status == 'subscribed') {
 
-					wp_send_json_success(array(
-						'action' => 'wpr_form_builder_mailchimp',
-						'status' => 'success',
-						'message' => 'Mailchimp subscription was successful',
-						'request' => $request
-					));
+					wp_send_json_success( [
+						'action'  => 'wpr_form_builder_mailchimp',
+						'status'  => 'success',
+						'message' => esc_html__( 'Mailchimp subscription was successful', 'wpr-addons' ),
+					] );
 
 				} else {
-					wp_send_json_error([ 
-						'action' => 'wpr_form_builder_mailchimp',
-						'status' => 'error',
-						'message' => 'Mailchimp subscription failed',
-						'request' => $request
-					]);
+					wp_send_json_error( [
+						'action'  => 'wpr_form_builder_mailchimp',
+						'status'  => 'error',
+						'message' => esc_html__( 'Mailchimp subscription failed', 'wpr-addons' ),
+					] );
 				}
 			}
 		} else {
 
-			wp_send_json_error([ 
-				'action' => 'wpr_form_builder_mailchimp',
-				'status' => 'error',
-				'message' => 'Mailchimp subscription failed',
-				'request' => $request
-			]);
+			wp_send_json_error( [
+				'action'  => 'wpr_form_builder_mailchimp',
+				'status'  => 'error',
+				'message' => esc_html__( 'Mailchimp subscription failed', 'wpr-addons' ),
+			] );
 		}
 	}
 

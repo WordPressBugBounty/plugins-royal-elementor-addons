@@ -1235,6 +1235,10 @@ class Wpr_Advanced_Accordion extends Widget_Base {
 			}
 		}
 
+		if ( ! Utilities::can_render_elementor_template( $id ) ) {
+			return '';
+		}
+
 		$edit_link = '<span class="wpr-template-edit-btn" data-permalink="'. get_permalink( $id ) .'">Edit Template</span>';
 		
 		$type = get_post_meta(get_the_ID(), '_wpr_template_type', true) || get_post_meta($id, '_elementor_template_type', true);

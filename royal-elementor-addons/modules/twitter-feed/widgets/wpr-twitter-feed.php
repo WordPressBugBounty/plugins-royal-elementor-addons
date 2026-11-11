@@ -593,6 +593,11 @@ class Wpr_Twitter_Feed extends Widget_Base {
 
 	}
 
+	// Get Animation Class
+	public function get_animation_class( $data, $object ) {
+		return Utilities::build_animation_class( $data, $object );
+	}
+
 	// Get Elements by Location
 	public function get_elements_by_location( $location, $settings, $item ) {
 		$locations = [];

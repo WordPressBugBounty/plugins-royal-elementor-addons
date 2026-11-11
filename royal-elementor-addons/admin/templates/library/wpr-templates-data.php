@@ -601,6 +601,19 @@ class WPR_Templates_Data {
 					'label' => 'new',
 					'priority' => 4,
 				],
+				'v3' => [
+					'name' => 'Electronic Store - V3 - Shop',
+					'pages' => 'home,shop,single-product,cart,compare,wishlist,checkout,blog,single-blog,about,faq,contact,',
+					'plugins' => '{"woocommerce":'. $is_woo_active .'}',
+					'tags' => 'shop shopping woo-commerce woocommerce estore ecommerce product online market reseller ecommerce shop gadget iphone phone electronic gadgets tech e commerce',
+					'theme-builder' => true,
+					'woo-builder' => true,
+					'off-canvas' => true,
+					'price' => $is_pro_active ? 'free' : 'pro',
+					'expert' => $is_expert ? 'free' : 'expert',
+					'label' => 'new',
+					'priority' => 4,
+				],
 			   'v4' => [
 					'name' => 'Electronic Store - V4 - Shop',
 					'pages' => 'home,shop,single-product,cart,compare,wishlist,checkout,blog,single-blog,about,faq,contact,',
@@ -2795,6 +2808,12 @@ class WPR_Templates_Data {
 				'name' => 'Electronic Store - V2',
 				'pages' => ['home','shop','cart','blog','about','contact'],
 				'preview' => ['home','shop','cart','blog','about','contact'],
+				'price' => $is_pro_active ? 'free' : 'pro',
+			],
+			'estore-v3' => [
+				'name' => 'Electronic Store - V3',
+				'pages' => ['home','shop','about','blog','faq','contact'],
+				'preview' => ['home','shop','about','blog','faq','contact'],
 				'price' => $is_pro_active ? 'free' : 'pro',
 			],
 			'estore-v4' => [

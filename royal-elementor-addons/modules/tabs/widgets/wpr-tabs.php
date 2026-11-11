@@ -1451,6 +1451,10 @@ class Wpr_Tabs extends Widget_Base {
 			}
 		}
 
+		if ( ! Utilities::can_render_elementor_template( $id ) ) {
+			return '';
+		}
+
 		$edit_link = '<span class="wpr-template-edit-btn" data-permalink="'. esc_url(get_permalink( $id )) .'">Edit Template</span>';
 		
 		// Add CSS in Editor

@@ -3770,24 +3770,12 @@ class Wpr_Form_Builder extends Widget_Base {
 		
 		$form_fields_length = sizeof($instance['form_fields']);
 		$thisId = $this->get_id();
+		$document_id = Utilities::wpr_get_current_document_id();
 
-		update_option('wpr_email_content_type_'. $this->get_id(), $instance['email_content_type']);
-		update_option('wpr_email_to_'. $this->get_id(), $instance['email_to']);
-		update_option('wpr_email_subject_'. $this->get_id(), $instance['email_subject']);
-		update_option('wpr_email_fields_'. $this->get_id(), $instance['email_content']);
-		update_option('wpr_cc_header_'. $this->get_id(), $instance['email_to_cc']);
-		update_option('wpr_bcc_header_'. $this->get_id(), $instance['email_to_bcc']);
-		update_option('wpr_email_from_'. $this->get_id(), $instance['email_from']);
-		update_option('wpr_email_from_name_'. $this->get_id(), $instance['email_from_name']);
-		update_option('wpr_reply_to_'. $this->get_id(), $instance['email_reply_to']);
-		update_option('wpr_meta_keys_'. $this->get_id(), $instance['form_metadata']);
-		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/'; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		update_option( 'wpr_referrer_' . $this->get_id(), esc_url_raw( home_url( $request_uri ) ) );
-		if ( $post && $post->ID ) {
-			update_option( 'wpr_referrer_title_' . $this->get_id(), sanitize_text_field( get_the_title( $post->ID ) ) );
+		if ( Utilities::wpr_should_persist_form_settings( $document_id ) ) {
+			$is_edit_mode = \Elementor\Plugin::$instance->editor->is_edit_mode();
+			Utilities::wpr_save_form_settings( $document_id, $this->get_id(), $instance, ! $is_edit_mode );
 		}
-
-		$this->wpr_persist_webhook_url( isset( $instance['webhook_url'] ) ? $instance['webhook_url'] : '' );
 
 		$emailField      = isset($instance['email_field']) ? $instance['email_field'] : '';
 		$firstNameField  = isset($instance['first_name_field']) ? $instance['first_name_field'] : '';
@@ -3880,6 +3868,7 @@ class Wpr_Form_Builder extends Widget_Base {
 			<input type="hidden" name="post_id" value="<?php // PHPCS - the method Utils::get_current_post_id is safe.
 				echo get_the_ID(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>"/>
 			<input type="hidden" name="form_id" value="<?php echo esc_attr( $this->get_id() ); ?>"/>
+			<input type="hidden" name="wpr_form_document_id" value="<?php echo esc_attr( $document_id ); ?>"/>
 			<input type="hidden" name="referer_title" value="<?php echo esc_attr( $referer_title ); ?>" />
 
 			<?php if ( is_singular() ) {
@@ -4147,19 +4136,18 @@ class Wpr_Form_Builder extends Widget_Base {
 	 * @param string $webhook_url Raw webhook URL from widget settings.
 	 */
 	protected function wpr_persist_webhook_url( $webhook_url ) {
-		if ( ! $this->wpr_should_persist_webhook_url() ) {
+		$document_id = Utilities::wpr_get_current_document_id();
+		if ( ! Utilities::wpr_should_persist_form_settings( $document_id ) ) {
 			return;
 		}
 
-		$validated = Utilities::wpr_validate_webhook_url( $webhook_url );
-
-		if ( is_wp_error( $validated ) ) {
-			// Refuse to store unsafe targets; clear any previous value for this widget.
-			update_option( 'wpr_webhook_url_' . $this->get_id(), '' );
-			return;
+		$instance = $this->get_settings_for_display();
+		if ( ! is_array( $instance ) ) {
+			$instance = [];
 		}
+		$instance['webhook_url'] = $webhook_url;
 
-		update_option( 'wpr_webhook_url_' . $this->get_id(), $validated );
+		Utilities::wpr_save_form_settings( $document_id, $this->get_id(), $instance, true );
 	}
 
 	/**
