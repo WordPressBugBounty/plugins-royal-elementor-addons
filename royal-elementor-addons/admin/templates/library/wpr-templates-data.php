@@ -815,6 +815,19 @@ class WPR_Templates_Data {
 					'label' => 'new',
 					'priority' => 15,
 				],
+				'v2' => [
+					'name' => 'Cosmetic Shop V2',
+					'pages' => 'home,shop,single-product,cart,checkout,wishlist,compare,about,faq,blog,single-blog,contact,',
+					'plugins' => '{"woocommerce":'. $is_woo_active .'}',
+					'tags' => 'free cosmetics store shop woo woocommerce estore ecommerce product estetic beauty skincare supplements makeup haircare customers health essentials nail perfumes',
+					'theme-builder' => true,
+					'woo-builder' => true,
+					'off-canvas' => true,
+					'price' => $is_pro_active ? 'free' : 'pro',
+					'expert' => $is_expert ? 'free' : 'expert',
+					'label' => 'new',
+					'priority' => 4,
+				],
 			],
 			'woo-auto-parts' => [
 				'v1' => [
@@ -2797,6 +2810,12 @@ class WPR_Templates_Data {
 				'pages' => ['home','shop','cart','about','faq','blog','contact',],
 				'preview' => ['home','shop','cart','about','faq','blog','contact',],
 				'price' => $is_pro_active ? 'free' : 'free',
+			],
+			'cosmetic-v2' => [
+				'name' => 'Cosmetic Shop V2',
+				'pages' => ['home','shop','about','faq','blog','contact',],
+				'preview' => ['home','shop','about','faq','blog','contact',],
+				'price' => $is_pro_active ? 'free' : 'pro',
 			],
 			'estore-v1' => [
 				'name' => 'Electronic Store - V1',
